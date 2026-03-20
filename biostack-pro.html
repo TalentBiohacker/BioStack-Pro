@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioStack Pro - Personalized Supplement Protocol Generator</title>
+    
+    <!-- Social Media Preview -->
+    <meta property="og:title" content="Get Your Personalized Biohacking Stack">
+    <meta property="og:description" content="Generate science-backed supplement protocols for your goals. One-time purchase, yours forever.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f97316;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card-hover: #334155;
+            --text: #f8fafc;
+            --text-light: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .pricing-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1rem;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .own-forever {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Medical Disclaimer Modal */
+        .disclaimer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .disclaimer-modal {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .disclaimer-modal h2 {
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer-content {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        .disclaimer-content h3 {
+            color: var(--text);
+            margin: 15px 0 10px;
+            font-size: 1rem;
+        }
+
+        .disclaimer-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer-content li {
+            margin-bottom: 8px;
+        }
+
+        .accept-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .accept-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-desc {
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        /* Progress */
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Goal Selection - Multi Select */
+        .goal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .goal-option {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .goal-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .goal-option.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.1));
+        }
+
+        .goal-option.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .goal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .goal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .goal-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .select-all-btn {
+            background: transparent;
+            border: 2px dashed var(--text-light);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .select-all-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Experience Selection */
+        .exp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .exp-grid { grid-template-columns: 1fr; }
+        }
+
+        .exp-option {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .exp-option:hover {
+            border-color: var(--secondary);
+        }
+
+        .exp-option.selected {
+            border-color: var(--secondary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .exp-level {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .exp-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Results */
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .selected-goals-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .goal-tag {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Timing Blocks */
+        .timing-block {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .timing-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .supplement-item {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.2s;
+        }
+
+        .supplement-item:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .supplement-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .supplement-dose {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .supplement-why {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .evidence-badge {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-strong { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-moderate { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge-emerging { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .action-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Paywall Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .price-display {
+            margin: 25px 0;
+        }
+
+        .original-price {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .current-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .price-note {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .discount-section {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .discount-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .discount-code {
+            flex: 1;
+            padding: 14px 16px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .discount-code:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .apply-code-btn {
+            padding: 14px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .discount-message {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .discount-success { color: var(--secondary); }
+        .discount-error { color: var(--danger); }
+
+        .features-list {
+            text-align: left;
+            margin: 20px 0;
+            list-style: none;
+        }
+
+        .features-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .features-list li::before {
+            content: "✓";
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .forever-note {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.1));
+            border: 1px solid var(--secondary);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .forever-note strong {
+            color: var(--secondary);
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .close-modal:hover {
+            color: var(--text);
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 18px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        .info-box strong {
+            color: var(--primary);
+        }
+
+        /* Hidden */
+        .hidden { display: none !important; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer-disclaimer {
+            max-width: 700px;
+            margin: 0 auto 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">🧬</div>
+            <h1>BioStack Pro</h1>
+            <p class="tagline">Generate your personalized supplement protocol</p>
+            <div class="pricing-pill">
+                <span>💎</span>
+                <span class="price">$9.99</span>
+                <span>one-time</span>
+            </div>
+            <span class="own-forever">✓ Download & keep forever ✓ Works offline ✓ Your data stays private</span>
+        </header>
+
+        <!-- Medical Disclaimer Modal (Required) -->
+        <div class="disclaimer-overlay" id="disclaimerModal">
+            <div class="disclaimer-modal">
+                <h2>⚠️ Medical Disclaimer & Terms</h2>
+                <div class="disclaimer-content">
+                    <p><strong>YOU MUST READ AND ACCEPT BEFORE USING THIS APPLICATION</strong></p>
+                    
+                    <h3>1. Not Medical Advice</h3>
+                    <p>This application provides educational information only. It is NOT medical advice, diagnosis, or treatment recommendation. Always consult a qualified healthcare provider before starting any supplement regimen.</p>
+                    
+                    <h3>2. FDA Disclaimer</h3>
+                    <p>These statements have not been evaluated by the Food and Drug Administration (FDA). Supplements mentioned are not intended to diagnose, treat, cure, or prevent any disease.</p>
+                    
+                    <h3>3. Consult Your Physician</h3>
+                    <p>Speak with your doctor before using supplements, especially if you:</p>
+                    <ul>
+                        <li>Have existing medical conditions</li>
+                        <li>Take prescription medications</li>
+                        <li>Are pregnant, nursing, or planning pregnancy</li>
+                        <li>Are under 18 years of age</li>
+                        <li>Have allergies to ingredients</li>
+                    </ul>
+                    
+                    <h3>4. Drug Interactions</h3>
+                    <p>Supplements can interact with medications including blood thinners, antidepressants, blood pressure drugs, and others. Review ALL supplements with your pharmacist.</p>
+                    
+                    <h3>5. Side Effects</h3>
+                    <p>Discontinue use and seek medical attention if you experience adverse reactions including allergic reactions, digestive issues, headaches, or unusual symptoms.</p>
+                    
+                    <h3>6. Age Restriction</h3>
+                    <p>This application is intended for users 18 years and older. Consult a pediatrician for minors.</p>
+                    
+                    <h3>7. Purchase Terms</h3>
+                    <p>This is a one-time digital download purchase. You own this file forever. Future updates may or may not be provided. No refunds after download. Discount codes cannot be combined.</p>
+                </div>
+                <button class="accept-btn" onclick="acceptDisclaimer()">
+                    I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 33%"></div>
+            </div>
+            <div class="progress-text" id="progressText">Step 1 of 3: Select your health goals</div>
+        </div>
+
+        <!-- Step 1: Goals (Multi-Select) -->
+        <div class="card" id="step1">
+            <h2>🎯 Select Your Health Goals</h2>
+            <p class="card-desc">Choose one or more goals. Select all that apply to get a comprehensive stack.</p>
+            
+            <button class="select-all-btn" onclick="selectAllGoals()">✨ Select All Goals</button>
+
+            <div class="goal-grid">
+                <div class="goal-option" data-goal="longevity" onclick="toggleGoal(this)">
+                    <div class="goal-icon">🧬</div>
+                    <div class="goal-title">Longevity & Anti-Aging</div>
+                    <div class="goal-desc">Cellular health, NAD+ boosters, senolytics, DNA repair, autophagy activation</div>
+                </div>
+                <div class="goal-option" data-goal="cognition" onclick="toggleGoal(this)">
+                    <div class="goal-icon">🧠</div>
+                    <div class="goal-title">Brain & Cognitive Function</div>
+                    <div class="goal-desc">Memory, focus, clarity, neuroprotection, neurogenesis support</div>
+                </div>
+                <div class="goal-option" data-goal="energy" onclick="toggleGoal(this)">
+                    <div class="goal-icon">⚡</div>
+                    <div class="goal-title">Energy & Mitochondria</div>
+                    <div class="goal-desc">Cellular energy, ATP production, fatigue reduction, metabolic health</div>
+                </div>
+                <div class="goal-option" data-goal="body" onclick="toggleGoal(this)">
+                    <div class="goal-icon">💪</div>
+                    <div class="goal-title">Body Composition & Muscle</div>
+                    <div class="goal-desc">Muscle preservation, metabolism, testosterone support, fat loss</div>
+                </div>
+                <div class="goal-option" data-goal="heart" onclick="toggleGoal(this)">
+                    <div class="goal-icon">❤️</div>
+                    <div class="goal-title">Cardiovascular Health</div>
+                    <div class="goal-desc">Heart function, circulation, blood pressure, arterial health</div>
+                </div>
+                <div class="goal-option" data-goal="sleep" onclick="toggleGoal(this)">
+                    <div class="goal-icon">😴</div>
+                    <div class="goal-title">Sleep & Recovery</div>
+                    <div class="goal-desc">Deep sleep, stress resilience, HGH release, recovery optimization</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Tip:</strong> Selecting multiple goals combines supplements into one comprehensive daily protocol organized by timing.
+            </div>
+
+            <button class="btn btn-primary" id="btn1" onclick="nextStep(2)" disabled>
+                Continue to Experience Level →
+            </button>
+        </div>
+
+        <!-- Step 2: Experience -->
+        <div class="card hidden" id="step2">
+            <h2>📊 Select Your Experience Level</h2>
+            <p class="card-desc">This determines the complexity and number of supplements in your stack.</p>
+
+            <div class="exp-grid">
+                <div class="exp-option" data-exp="beginner" onclick="selectExperience(this)">
+                    <div class="exp-level">🌱 Beginner</div>
+                    <div class="exp-desc">New to supplements<br>3-5 core supplements<br>Focus on essentials</div>
+                </div>
+                <div class="exp-option" data-exp="intermediate" onclick="selectExperience(this)">
+                    <div class="exp-level">🌿 Intermediate</div>
+                    <div class="exp-desc">Some experience<br>6-10 supplements<br>Proven compounds</div>
+                </div>
+                <div class="exp-option" data-exp="advanced" onclick="selectExperience(this)">
+                    <div class="exp-level">🔬 Advanced</div>
+                    <div class="exp-desc">Biohacker level<br>10-15 supplements<br>Cutting-edge stack</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn2" onclick="generateStack()" disabled>
+                Generate My Complete Stack 🧬
+            </button>
+            <button class="btn btn-secondary" onclick="prevStep(1)" style="margin-top: 12px;">
+                ← Back to Goals
+            </button>
+        </div>
+
+        <!-- Results -->
+        <div class="card hidden" id="results">
+            <div class="results-header">
+                <h2>✅ Your Personalized BioStack</h2>
+                <p style="color: var(--text-light); margin-top: 10px;">Based on your selected goals and experience level</p>
+                <div class="selected-goals-tags" id="selectedGoalsDisplay"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>📋 Medical Reminder:</strong> Review this stack with your healthcare provider before purchasing supplements, especially if you take medications or have health conditions.
+            </div>
+
+            <div id="stackContainer"></div>
+
+            <div class="action-grid">
+                <button class="btn btn-primary" onclick="showPaywall()">
+                    📄 Download Complete Guide
+                </button>
+                <button class="btn btn-secondary" onclick="restart()">
+                    🔄 Create New Stack
+                </button>
+            </div>
+        </div>
+
+        <!-- Paywall Modal -->
+        <div class="modal-overlay hidden" id="paywallModal">
+            <div class="modal-content">
+                <div class="modal-icon">📄</div>
+                <h3 class="modal-title">Get Your Complete Stack Guide</h3>
+                <p style="color: var(--text-light);">Download your personalized PDF protocol</p>
+                
+                <div class="price-display">
+                    <span class="original-price hidden" id="originalPrice">$9.99</span>
+                    <span class="current-price" id="currentPrice">$9.99</span>
+                    <div class="price-note">One-time purchase. Yours forever.</div>
+                </div>
+
+                <div class="discount-section">
+                    <div class="discount-input">
+                        <input type="text" class="discount-code" id="discountCode" placeholder="Enter code (e.g., CLASSMATE75)" maxlength="15">
+                        <button class="apply-code-btn" onclick="applyDiscount()">Apply</button>
+                    </div>
+                    <div class="discount-message" id="discountMessage"></div>
+                </div>
+                
+                <ul class="features-list">
+                    <li>Complete supplement schedule by timing</li>
+                    <li>Exact dosages & evidence ratings</li>
+                    <li>Drug interaction warnings</li>
+                    <li>Print-friendly for your doctor</li>
+                    <li>Offline access - yours forever</li>
+                </ul>
+
+                <div class="forever-note">
+                    <strong>🔒 You Own This Forever</strong><br>
+                    Download once, keep forever. Works offline. Future updates may or may not be provided.
+                </div>
+
+                <input type="email" class="email-input" id="emailInput" placeholder="Enter your email for receipt">
+
+                <button class="btn btn-success" onclick="processPayment()">
+                    💳 Pay & Download Now
+                </button>
+                
+                <p style="color: var(--text-light); font-size: 0.85rem; margin-top: 10px;">
+                    🔒 Secure payment. Instant PDF delivery after payment.
+                </p>
+                
+                <button class="close-modal" onclick="closePaywall()">
+                    Continue with free preview
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p class="footer-disclaimer">
+                <strong>Medical Disclaimer:</strong> This application provides educational information only and is not medical advice. 
+                Consult a qualified healthcare provider before starting any supplement regimen. Supplements are not FDA approved 
+                to diagnose, treat, cure, or prevent any disease. Individual results may vary. Age 18+ only.
+            </p>
+            <p>© 2025 BioStack Pro. All rights reserved.</p>
+            <p style="margin-top: 10px; font-size: 0.75rem;">
+                One-time purchase. You own this file forever. Future updates may or may not be provided.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // SIMPLE PAYMENT SETUP - ONLY 1 STRIPE LINK NEEDED
+        // ============================================
+        
+        // STEP 1: Go to https://dashboard.stripe.com/payment-links
+        // STEP 2: Create ONE payment link:
+        //    - Product name: "BioStack Pro"
+        //    - Price: $9.99
+        // STEP 3: Copy that link URL and paste it below (replace YOUR_STRIPE_LINK_HERE):
+        const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00';
+        
+        // Your payment info for discount codes (manual payment)
+        const VENMO_HANDLE = '@talentbiohacker';
+        const PAYPAL_EMAIL = 'talentbiohacker@gmail.com';
+        
+        // ============================================
+        // ============================================
+        // SUPPLEMENT DATABASE - Evidence-Based
+        // ============================================
+        const supplementDatabase = {
+            longevity: [
+                { name: "NMN (Nicotinamide Mononucleotide)", dose: "250-500mg", timing: "morning", why: "Boosts NAD+ for cellular energy and DNA repair", evidence: "strong" },
+                { name: "Resveratrol (Trans-Resveratrol)", dose: "500mg", timing: "morning", why: "Activates sirtuins (longevity genes), mimics calorie restriction", evidence: "moderate" },
+                { name: "Quercetin + Fisetin", dose: "500mg (pulsed monthly)", timing: "cyclic", why: "Senolytics - clear zombie aging cells", evidence: "moderate" },
+                { name: "Spermidine", dose: "1-3mg", timing: "morning", why: "Induces autophagy (cellular cleanup)", evidence: "emerging" },
+                { name: "Glycine", dose: "3g", timing: "evening", why: "Collagen synthesis, sleep quality, methylation", evidence: "moderate" },
+                { name: "Hyaluronic Acid", dose: "120-200mg", timing: "morning", why: "Skin hydration, joint lubrication", evidence: "moderate" },
+                { name: "Ca-AKG (Calcium Alpha-Ketoglutarate)", dose: "1g", timing: "morning", why: "Metabolic health, longevity biomarker improvement", evidence: "emerging" },
+                { name: "Astaxanthin", dose: "12mg", timing: "morning", why: "Mitochondrial membrane protection, antioxidant", evidence: "moderate" },
+                { name: "Rapamycin (Prescription)", dose: "1-6mg (physician guided)", timing: "weekly", why: "mTOR inhibition, proven longevity in mammals", evidence: "emerging" },
+                { name: "Metformin (Prescription)", dose: "500-1000mg", timing: "evening", why: "AMPK activation, glucose control, TAME trial", evidence: "moderate" }
+            ],
+            cognition: [
+                { name: "Omega-3 DHA/EPA", dose: "2-4g", timing: "morning", why: "Brain cell membrane integrity, anti-inflammatory", evidence: "strong" },
+                { name: "Lion's Mane (Hericium)", dose: "1000-3000mg", timing: "morning", why: "Nerve growth factor, neurogenesis, myelin", evidence: "emerging" },
+                { name: "Bacopa Monnieri (50% Bacosides)", dose: "300mg", timing: "morning", why: "Memory consolidation, adaptogen for stress", evidence: "moderate" },
+                { name: "Phosphatidylserine", dose: "100mg", timing: "morning", why: "Cortisol management, brain cell membrane", evidence: "moderate" },
+                { name: "Alpha-GPC", dose: "300-600mg", timing: "morning", why: "Acetylcholine precursor, focus & learning", evidence: "moderate" },
+                { name: "Uridine Monophosphate", dose: "150-300mg", timing: "morning", why: "Synaptic plasticity, memory formation", evidence: "emerging" },
+                { name: "Magnesium L-Threonate", dose: "1-2g", timing: "evening", why: "Crosses blood-brain barrier, synaptic density", evidence: "emerging" },
+                { name: "Citicoline (CDP-Choline)", dose: "250-500mg", timing: "morning", why: "Choline source, phospholipid synthesis", evidence: "moderate" },
+                { name: "Huperzine A", dose: "200mcg", timing: "morning", why: "Acetylcholinesterase inhibitor", evidence: "moderate" },
+                { name: "Aniracetam", dose: "750mg", timing: "morning", why: "AMPAkine, cognitive enhancement", evidence: "emerging" }
+            ],
+            energy: [
+                { name: "CoQ10 (Ubiquinol)", dose: "100-200mg", timing: "morning", why: "Mitochondrial ATP production, heart health", evidence: "strong" },
+                { name: "PQQ (Pyrroloquinoline)", dose: "20mg", timing: "morning", why: "Mitochondrial biogenesis, new mitochondria", evidence: "emerging" },
+                { name: "D-Ribose", dose: "5g", timing: "morning", why: "ATP synthesis backbone", evidence: "moderate" },
+                { name: "NADH", dose: "10-20mg", timing: "morning", why: "Direct electron donor for energy", evidence: "moderate" },
+                { name: "Creatine Monohydrate", dose: "5g", timing: "morning", why: "ATP-PCr system, cognitive energy", evidence: "strong" },
+                { name: "B-Complex (Active Forms)", dose: "1 cap", timing: "morning", why: "Cofactors for energy metabolism", evidence: "strong" },
+                { name: "ALCAR (Acetyl-L-Carnitine)", dose: "500-1500mg", timing: "morning", why: "Fatty acid transport to mitochondria", evidence: "moderate" },
+                { name: "Alpha Lipoic Acid", dose: "300mg", timing: "morning", why: "Mitochondrial antioxidant, glucose uptake", evidence: "moderate" },
+                { name: "Iron (if deficient)", dose: "Blood test first", timing: "morning", why: "Oxygen transport, energy production", evidence: "strong" }
+            ],
+            body: [
+                { name: "Creatine Monohydrate", dose: "5g daily", timing: "any", why: "Muscle strength, cognitive benefits", evidence: "strong" },
+                { name: "HMB (Beta-Hydroxy)", dose: "3g", timing: "morning", why: "Prevents muscle breakdown, anabolic", evidence: "strong" },
+                { name: "Leucine", dose: "3g", timing: "workout", why: "mTOR activation, muscle protein synthesis", evidence: "strong" },
+                { name: "Whey Protein Isolate", dose: "25-30g", timing: "post-workout", why: "Complete amino acid profile", evidence: "strong" },
+                { name: "Tongkat Ali (Eurycoma)", dose: "200-400mg", timing: "morning", why: "Free testosterone support, cortisol reduction", evidence: "moderate" },
+                { name: "Forskolin (Coleus)", dose: "250mg", timing: "morning", why: "cAMP increase, testosterone, fat loss", evidence: "moderate" },
+                { name: "Berberine", dose: "500mg x2", timing: "meals", why: "AMPK activation, glucose disposal", evidence: "strong" },
+                { name: "Turkesterone", dose: "500mg", timing: "morning", why: "Phytoecdysteroid, protein synthesis", evidence: "emerging" },
+                { name: "Vitamin D3", dose: "2000-5000 IU", timing: "morning", why: "Testosterone, muscle function, immune", evidence: "strong" },
+                { name: "Zinc", dose: "15-30mg", timing: "evening", why: "Testosterone production, immune function", evidence: "strong" }
+            ],
+            heart: [
+                { name: "Omega-3 EPA/DHA", dose: "2-4g", timing: "morning", why: "Triglyceride reduction, inflammation", evidence: "strong" },
+                { name: "Vitamin K2 (MK-7)", dose: "100-200mcg", timing: "morning", why: "Directs calcium to bones, not arteries", evidence: "moderate" },
+                { name: "Magnesium Glycinate", dose: "400mg", timing: "evening", why: "Blood pressure, heart rhythm, relaxation", evidence: "strong" },
+                { name: "Garlic Extract", dose: "600-1200mg", timing: "morning", why: "Blood pressure, arterial flexibility", evidence: "moderate" },
+                { name: "CoQ10", dose: "100mg", timing: "morning", why: "Heart muscle energy production", evidence: "strong" },
+                { name: "Hawthorn Berry", dose: "500-1000mg", timing: "morning", why: "Cardiac function, blood flow", evidence: "moderate" },
+                { name: "Red Yeast Rice", dose: "1200mg", timing: "evening", why: "Cholesterol management (natural statin)", evidence: "moderate" },
+                { name: "Nattokinase", dose: "2000 FU", timing: "evening", why: "Fibrinolytic activity, circulation", evidence: "emerging" }
+            ],
+            sleep: [
+                { name: "Magnesium Glycinate", dose: "400mg", timing: "bedtime", why: "GABA activation, muscle relaxation", evidence: "strong" },
+                { name: "L-Theanine", dose: "200mg", timing: "bedtime", why: "Alpha waves, calm without drowsiness", evidence: "strong" },
+                { name: "Apigenin", dose: "50mg", timing: "bedtime", why: "GABA receptor modulation, CD38 inhibition", evidence: "moderate" },
+                { name: "Glycine", dose: "3g", timing: "bedtime", why: "Lowers core temperature, sleep quality", evidence: "moderate" },
+                { name: "Melatonin (Time Release)", dose: "0.3-1mg", timing: "bedtime", why: "Circadian rhythm (low dose effective)", evidence: "strong" },
+                { name: "Myo-inositol", dose: "2-4g", timing: "bedtime", why: "Sleep quality, anxiety, PCOS support", evidence: "moderate" },
+                { name: "GABA", dose: "500-750mg", timing: "bedtime", why: "Calming neurotransmitter", evidence: "moderate" },
+                { name: "5-HTP", dose: "100-200mg", timing: "bedtime", why: "Serotonin precursor, sleep depth", evidence: "moderate" }
+            ]
+        };
+
+        // ============================================
+        // DISCOUNT CODE SYSTEM
+        // ============================================
+        const discountCodes = {
+            'CLASSMATE75': { discount: 0.75, message: 'Classmate discount applied! 75% off', type: 'success' },
+            'FRIEND100': { discount: 1.0, message: 'Friend discount applied! FREE download', type: 'success' },
+            'HALF50': { discount: 0.50, message: '50% discount applied!', type: 'success' }
+        };
+
+        const BASE_PRICE = 9.99;
+        let currentDiscount = 0;
+        let acceptedDisclaimer = false;
+
+        // ============================================
+        // APP STATE
+        // ============================================
+        let selectedGoals = [];
+        let experienceLevel = '';
+        let currentStack = [];
+
+        // ============================================
+        // DISCLAIMER HANDLING
+        // ============================================
+        function acceptDisclaimer() {
+            acceptedDisclaimer = true;
+            document.getElementById('disclaimerModal').classList.add('hidden');
+        }
+
+        // ============================================
+        // GOAL SELECTION (Multi-Select)
+        // ============================================
+        function selectAllGoals() {
+            const allGoals = ['longevity', 'cognition', 'energy', 'body', 'heart', 'sleep'];
+            const goalElements = document.querySelectorAll('.goal-option');
+            
+            if (selectedGoals.length === 6) {
+                // Deselect all
+                selectedGoals = [];
+                goalElements.forEach(el => el.classList.remove('selected'));
+            } else {
+                // Select all
+                selectedGoals = [...allGoals];
+                goalElements.forEach(el => el.classList.add('selected'));
+            }
+            
+            document.getElementById('btn1').disabled = selectedGoals.length === 0;
+        }
+
+        function toggleGoal(element) {
+            const goal = element.getAttribute('data-goal');
+            
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedGoals = selectedGoals.filter(g => g !== goal);
+            } else {
+                element.classList.add('selected');
+                selectedGoals.push(goal);
+            }
+            
+            document.getElementById('btn1').disabled = selectedGoals.length === 0;
+        }
+
+        // ============================================
+        // EXPERIENCE SELECTION
+        // ============================================
+        function selectExperience(element) {
+            document.querySelectorAll('.exp-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            experienceLevel = element.getAttribute('data-exp');
+            document.getElementById('btn2').disabled = false;
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function updateProgress(step) {
+            const percent = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+            const texts = [
+                'Step 1 of 3: Select your health goals',
+                'Step 2 of 3: Choose experience level', 
+                'Step 3 of 3: Your personalized stack'
+            ];
+            document.getElementById('progressText').textContent = texts[step - 1];
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+            document.getElementById('step' + step).classList.remove('hidden');
+            updateProgress(step);
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        // ============================================
+        // STACK GENERATION
+        // ============================================
+        function generateStack() {
+            currentStack = [];
+            
+            // Supplements per goal based on experience
+            const counts = {
+                beginner: 3,
+                intermediate: 5,
+                advanced: 8
+            };
+            const countPerGoal = counts[experienceLevel] || 5;
+            
+            // Get supplements for each selected goal
+            selectedGoals.forEach(goal => {
+                const supps = supplementDatabase[goal];
+                if (supps) {
+                    currentStack.push(...supps.slice(0, countPerGoal));
+                }
+            });
+            
+            // Remove duplicates (same name = same supplement)
+            const seen = new Set();
+            currentStack = currentStack.filter(supp => {
+                const key = supp.name.split('(')[0].trim().toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+            
+            displayResults();
+        }
+
+        // ============================================
+        // RESULTS DISPLAY
+        // ============================================
+        function displayResults() {
+            updateProgress(3);
+            document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Display selected goals
+            const goalNames = {
+                longevity: 'Longevity & Anti-Aging',
+                cognition: 'Brain & Cognitive Function',
+                energy: 'Energy & Mitochondria',
+                body: 'Body Composition & Muscle',
+                heart: 'Cardiovascular Health',
+                sleep: 'Sleep & Recovery'
+            };
+            
+            document.getElementById('selectedGoalsDisplay').innerHTML = selectedGoals
+                .map(g => `<span class="goal-tag">${goalNames[g]}</span>`)
+                .join('');
+            
+            // Group by timing
+            const timingOrder = ['morning', 'evening', 'bedtime', 'cyclic', 'any', 'workout', 'meals', 'post-workout', 'weekly'];
+            const timingNames = {
+                morning: '🌅 Morning (With Breakfast)',
+                evening: '🌙 Evening (With Dinner)',
+                bedtime: '😴 Bedtime (Empty Stomach)',
+                cyclic: '🔄 Cyclic (2-3x/Month)',
+                any: '☀️ Any Time',
+                workout: '💪 Pre-Workout',
+                meals: '🍽️ With Meals',
+                'post-workout': '💪 Post-Workout',
+                weekly: '📅 Weekly (Rx Required)'
+            };
+            
+            const byTiming = {};
+            currentStack.forEach(supp => {
+                if (!byTiming[supp.timing]) byTiming[supp.timing] = [];
+                byTiming[supp.timing].push(supp);
+            });
+            
+            // Build HTML
+            let html = '';
+            timingOrder.forEach(timing => {
+                if (byTiming[timing] && byTiming[timing].length > 0) {
+                    html += `
+                        <div class="timing-block">
+                            <div class="timing-header">${timingNames[timing] || timing}</div>
+                    `;
+                    byTiming[timing].forEach(supp => {
+                        html += `
+                            <div class="supplement-item">
+                                <div class="supplement-info">
+                                    <h4>${supp.name}</h4>
+                                    <div class="supplement-dose">${supp.dose}</div>
+                                    <div class="supplement-why">${supp.why}</div>
+                                </div>
+                                <span class="evidence-badge badge-${supp.evidence}">${supp.evidence}</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+            });
+            
+            document.getElementById('stackContainer').innerHTML = html;
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============================================
+        // PAYMENT & DISCOUNT SYSTEM
+        // ============================================
+        function showPaywall() {
+            document.getElementById('paywallModal').classList.remove('hidden');
+        }
+
+        function closePaywall() {
+            document.getElementById('paywallModal').classList.add('hidden');
+        }
+
+        function applyDiscount() {
+            const code = document.getElementById('discountCode').value.trim().toUpperCase();
+            const messageEl = document.getElementById('discountMessage');
+            const currentPriceEl = document.getElementById('currentPrice');
+            const originalPriceEl = document.getElementById('originalPrice');
+            
+            if (!code) {
+                messageEl.textContent = 'Please enter a discount code';
+                messageEl.className = 'discount-message discount-error';
+                return;
+            }
+            
+            const discount = discountCodes[code];
+            
+            if (discount) {
+                currentDiscount = discount.discount;
+                const newPrice = (BASE_PRICE * (1 - currentDiscount)).toFixed(2);
+                
+                currentPriceEl.textContent = newPrice === '0.00' ? 'FREE' : `$${newPrice}`;
+                originalPriceEl.classList.remove('hidden');
+                
+                messageEl.textContent = discount.message;
+                messageEl.className = 'discount-message discount-success';
+            } else {
+                currentDiscount = 0;
+                currentPriceEl.textContent = `$${BASE_PRICE.toFixed(2)}`;
+                originalPriceEl.classList.add('hidden');
+                
+                messageEl.textContent = 'Invalid discount code';
+                messageEl.className = 'discount-message discount-error';
+            }
+        }
+
+        function processPayment() {
+            const email = document.getElementById('emailInput').value;
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            const finalPrice = (BASE_PRICE * (1 - currentDiscount)).toFixed(2);
+            
+            // FREE DOWNLOAD - FRIEND100 code
+            if (finalPrice === '0.00') {
+                downloadPDF();
+                closePaywall();
+                return;
+            }
+            
+            // DISCOUNT CODES - Manual payment via Venmo/PayPal
+            if (currentDiscount > 0) {
+                const discountAmount = currentDiscount === 0.75 ? '$2.50' : '$5.00';
+                const message = `You have a ${currentDiscount === 0.75 ? '75%' : '50%'} discount!\n\nPay ${discountAmount} via:\n\nVenmo: ${VENMO_HANDLE}\nOR\nPayPal: ${PAYPAL_EMAIL}\n\nInclude your email in the note: ${email}\n\nAfter paying, click OK to download your PDF.`;
+                
+                if (confirm(message)) {
+                    downloadPDF();
+                    closePaywall();
+                }
+                return;
+            }
+            
+            // FULL PRICE - Stripe checkout
+            // Open Stripe checkout
+            const checkoutUrl = STRIPE_PAYMENT_LINK + '?prefilled_email=' + encodeURIComponent(email);
+            window.open(checkoutUrl, '_blank');
+            
+            alert(
+                'Stripe checkout opened in a new tab!\n\n' +
+                'After you complete payment, come back here and click:\n' +
+                '"I\'ve Paid - Download My PDF"'
+            );
+            
+            // Change button to download after payment
+            const btn = document.querySelector('.btn-success');
+            btn.textContent = '✅ I\'ve Paid - Download My PDF';
+            btn.onclick = function() {
+                downloadPDF();
+                closePaywall();
+                // Reset button for next time
+                setTimeout(() => {
+                    btn.textContent = '💳 Pay & Download Now';
+                    btn.onclick = processPayment;
+                }, 1000);
+            };
+        }
+
+        // ============================================
+        // PDF GENERATION
+        // ============================================
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header with styling
+            doc.setFillColor(99, 102, 241);
+            doc.rect(0, 0, 210, 50, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(28);
+            doc.setFont(undefined, 'bold');
+            doc.text("BioStack Pro", 20, 30);
+            
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text("Your Personalized Supplement Protocol", 20, 42);
+            
+            // Date
+            const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            doc.text(`Generated: ${date}`, 150, 42);
+            
+            let y = 60;
+            
+            // Selected Goals
+            doc.setTextColor(99, 102, 241);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text("Your Selected Goals:", 20, y);
+            y += 10;
+            
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            const goalNames = {
+                longevity: 'Longevity & Anti-Aging',
+                cognition: 'Brain & Cognitive Function',
+                energy: 'Energy & Mitochondria',
+                body: 'Body Composition & Muscle',
+                heart: 'Cardiovascular Health',
+                sleep: 'Sleep & Recovery'
+            };
+            selectedGoals.forEach(goal => {
+                doc.text(`• ${goalNames[goal]}`, 25, y);
+                y += 7;
+            });
+            y += 10;
+            
+            // Experience Level
+            doc.setTextColor(99, 102, 241);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Experience Level: ${experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)}`, 20, y);
+            y += 15;
+            
+            // Supplements by timing
+            const timingNames = {
+                morning: 'Morning (With Breakfast)',
+                evening: 'Evening (With Dinner)',
+                bedtime: 'Bedtime (Empty Stomach / 30 min before sleep)',
+                cyclic: 'Cyclic (2-3x per Month - Senolytic protocol)',
+                any: 'Any Time of Day',
+                workout: 'Pre-Workout (30 min before)',
+                meals: 'With Meals (take with food)',
+                'post-workout': 'Post-Workout (within 30 min)',
+                weekly: 'Weekly (Prescription Required)'
+            };
+            
+            const evidenceDesc = {
+                strong: 'Strong: Multiple clinical trials',
+                moderate: 'Moderate: Some human studies',
+                emerging: 'Emerging: Promising early research'
+            };
+            
+            const byTiming = {};
+            currentStack.forEach(supp => {
+                if (!byTiming[supp.timing]) byTiming[supp.timing] = [];
+                byTiming[supp.timing].push(supp);
+            });
+            
+            Object.keys(byTiming).forEach(timing => {
+                if (y > 260) {
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                // Timing header
+                doc.setFillColor(239, 246, 255);
+                doc.rect(20, y - 6, 170, 10, 'F');
+                doc.setTextColor(99, 102, 241);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(timingNames[timing] || timing, 25, y);
+                y += 15;
+                
+                // Supplements
+                byTiming[timing].forEach(supp => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    doc.setTextColor(30, 41, 59);
+                    doc.setFontSize(11);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${supp.name}`, 25, y);
+                    y += 6;
+                    
+                    doc.setFont(undefined, 'normal');
+                    doc.setTextColor(245, 158, 11);
+                    doc.text(`Dosage: ${supp.dose}`, 25, y);
+                    y += 5;
+                    
+                    doc.setFontSize(9);
+                    doc.setTextColor(100, 116, 139);
+                    const whyText = doc.splitTextToSize(supp.why, 160);
+                    doc.text(whyText, 25, y);
+                    y += whyText.length * 4 + 2;
+                    
+                    doc.setFontSize(8);
+                    doc.setTextColor(99, 102, 241);
+                    doc.text(`Evidence Level: ${evidenceDesc[supp.evidence]}`, 25, y);
+                    y += 10;
+                });
+                
+                y += 5;
+            });
+            
+            // Medical Disclaimer Page
+            doc.addPage();
+            y = 20;
+            
+            doc.setFillColor(254, 242, 242);
+            doc.rect(15, y - 5, 180, 120, 'F');
+            
+            doc.setTextColor(153, 27, 27);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text("IMPORTANT MEDICAL DISCLAIMER", 20, y + 10);
+            
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const disclaimer = `This report is for educational purposes only and is NOT medical advice. 
+
+Always consult a qualified healthcare provider before starting any supplement regimen, especially if you have medical conditions, take medications, are pregnant/nursing, or are under 18.
+
+Supplements can interact with prescription medications including blood thinners, antidepressants, and blood pressure drugs. Review ALL supplements with your doctor and pharmacist.
+
+These statements have not been evaluated by the FDA. Supplements are not intended to diagnose, treat, cure, or prevent any disease.
+
+Discontinue use and seek medical attention if you experience adverse reactions including allergic reactions, digestive issues, or unusual symptoms.
+
+Individual results may vary. Age 18+ only.`;
+            
+            const splitDisclaimer = doc.splitTextToSize(disclaimer, 170);
+            doc.text(splitDisclaimer, 20, y + 25);
+            
+            // Footer
+            doc.setTextColor(148, 163, 184);
+            doc.setFontSize(8);
+            doc.text("Generated by BioStack Pro | © 2025 | One-time purchase - yours forever", 20, 285);
+            
+            // Save
+            doc.save('BioStack-Pro-My-Protocol.pdf');
+        }
+
+        // ============================================
+        // RESET
+        // ============================================
+        function restart() {
+            selectedGoals = [];
+            experienceLevel = '';
+            currentStack = [];
+            currentDiscount = 0;
+            
+            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.btn-primary').forEach(btn => btn.disabled = true);
+            document.getElementById('discountCode').value = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('discountMessage').textContent = '';
+            document.getElementById('currentPrice').textContent = '$9.99';
+            document.getElementById('originalPrice').classList.add('hidden');
+            
+            nextStep(1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Enter key support for discount code
+        document.getElementById('discountCode')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyDiscount();
+        });
+    </script>
+</body>
+</html>
