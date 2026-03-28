@@ -851,7 +851,7 @@
 
                 <div class="discount-section">
                     <div class="discount-input">
-                        <input type="text" id="discCode" placeholder="Enter code (e.g., CLASSMATE75)" maxlength="15">
+                        <input type="text" id="discCode" placeholder="Enter code" maxlength="15">
                         <button onclick="applyDisc()">Apply</button>
                     </div>
                     <div class="discount-message" id="discMsg"></div>
@@ -1138,77 +1138,175 @@
             document.getElementById('stackContainer').innerHTML = html;
         }
 
-        // Download PDF
+        // Download PDF with loading check and fallback
         function downloadPDF() {
-            // Check if jsPDF loaded
+            const btn = document.querySelector('#step4 .btn-success') || document.querySelector('.btn-success');
+            const originalText = btn ? btn.textContent : '📄 PDF';
+            
             if (!window.jspdf) {
-                alert('PDF library loading... Please try again in a moment.');
+                if (btn) btn.textContent = '⏳ Loading...';
+                setTimeout(() => {
+                    if (btn) btn.textContent = originalText;
+                    if (!window.jspdf) {
+                        downloadTextFile();
+                        return;
+                    }
+                    downloadPDF();
+                }, 2000);
                 return;
             }
+            
+            if (btn) btn.textContent = '⏳ Generating...';
             
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-            
-            doc.setFillColor(99, 102, 241);
-            doc.rect(0, 0, 210, 50, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(28);
-            doc.setFont(undefined, 'bold');
-            doc.text("BioStack Pro", 20, 30);
-            doc.setFontSize(12);
-            doc.setFont(undefined, 'normal');
-            doc.text("Personalized Supplement Protocol", 20, 42);
-            
-            let y = 60;
+                
+                doc.setFillColor(99, 102, 241);
+                doc.rect(0, 0, 210, 50, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(28);
+                doc.setFont(undefined, 'bold');
+                doc.text("BioStack Pro", 20, 30);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.text("Personalized Supplement Protocol", 20, 42);
+                
+                doc.setTextColor(100, 116, 139);
+                doc.setFontSize(8);
+                doc.text("Contains Amazon affiliate links - talentbiohack-20", 20, 48);
+                
+                let y = 58;
+                const goalNames = { longevity: 'Longevity', cognition: 'Cognition', energy: 'Energy', body: 'Body', heart: 'Heart', sleep: 'Sleep' };
+                
+                doc.setTextColor(99, 102, 241);
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text("Goals:", 20, y);
+                y += 8;
+                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                selectedGoals.forEach(g => { doc.text(`• ${goalNames[g]}`, 25, y); y += 6; });
+                y += 8;
+                
+                const timingNames = { morning: 'Morning', evening: 'Evening', bedtime: 'Bedtime', workout: 'Workout', any: 'Any Time' };
+                const byTiming = {};
+                currentStack.forEach(s => { if (!byTiming[s.timing]) byTiming[s.timing] = []; byTiming[s.timing].push(s); });
+                
+                Object.keys(byTiming).forEach(t => {
+                    if (y > 275) { doc.addPage(); y = 20; }
+                    doc.setFillColor(239, 246, 255);
+                    doc.rect(20, y - 5, 170, 9, 'F');
+                    doc.setTextColor(99, 102, 241);
+                    doc.setFontSize(11);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(timingNames[t] || t, 25, y);
+                    y += 12;
+                    
+                    byTiming[t].forEach(s => {
+                        if (y > 275) { doc.addPage(); y = 20; }
+                        doc.setTextColor(30, 41, 59);
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(s.name.substring(0, 65), 25, y);
+                        y += 5;
+                        doc.setFont(undefined, 'normal');
+                        doc.setTextColor(245, 158, 11);
+                        doc.text(`Dose: ${s.dose}`, 25, y);
+                        y += 4;
+                        doc.setFontSize(8);
+                        doc.setTextColor(100, 116, 139);
+                        const why = doc.splitTextToSize(s.why, 160);
+                        doc.text(why, 25, y);
+                        y += why.length * 3.5 + 2;
+                        
+                        const link = amazonLinks[s.name];
+                        if (link) {
+                            doc.setTextColor(255, 153, 0);
+                            doc.setFont(undefined, 'bold');
+                            doc.textWithLink('Buy on Amazon →', 25, y, { url: link });
+                            y += 6;
+                        }
+                    });
+                    y += 3;
+                });
+                
+                doc.addPage();
+                doc.setFillColor(239, 246, 255);
+                doc.rect(15, 15, 180, 50, 'F');
+                doc.setTextColor(99, 102, 241);
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text("RETURNING CUSTOMER DISCOUNT", 20, 28);
+                doc.setTextColor(16, 185, 129);
+                doc.setFontSize(28);
+                doc.text("HALF50", 80, 45);
+                doc.setTextColor(30, 41, 59);
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.text("Use code HALF50 for 50% off your next stack!", 20, 58);
+                
+                doc.setFillColor(254, 242, 242);
+                doc.rect(15, 70, 180, 40, 'F');
+                doc.setTextColor(153, 27, 27);
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'bold');
+                doc.text("MEDICAL DISCLAIMER", 20, 80);
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.text("This is for educational purposes only. Consult a healthcare provider before starting", 20, 87);
+                doc.text("any supplement regimen. Not evaluated by the FDA. Age 18+ only.", 20, 92);
+                
+                doc.save('BioStack-Pro-Protocol.pdf');
+                if (btn) btn.textContent = originalText;
+            } catch (err) {
+                console.error('PDF Error:', err);
+                if (btn) btn.textContent = originalText;
+                downloadTextFile();
+            }
+        }
+        
+        // Fallback text download
+        function downloadTextFile() {
             const goalNames = { longevity: 'Longevity', cognition: 'Cognition', energy: 'Energy', body: 'Body', heart: 'Heart', sleep: 'Sleep' };
+            let text = "═══════════════════════════════════════\n";
+            text += "  BioStack Pro - Supplement Protocol\n";
+            text += `  Generated: ${new Date().toLocaleDateString()}\n`;
+            text += "═══════════════════════════════════════\n\n";
+            text += `GOALS: ${selectedGoals.map(g => goalNames[g]).join(', ')}\n\n`;
             
-            doc.setTextColor(99, 102, 241);
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.text("Goals:", 20, y);
-            y += 10;
-            doc.setTextColor(30, 41, 59);
-            doc.setFontSize(11);
-            doc.setFont(undefined, 'normal');
-            selectedGoals.forEach(g => { doc.text(`• ${goalNames[g]}`, 25, y); y += 7; });
-            y += 10;
-            
-            const timingNames = { morning: 'Morning', evening: 'Evening', bedtime: 'Bedtime', workout: 'Workout', any: 'Any Time' };
             const byTiming = {};
             currentStack.forEach(s => { if (!byTiming[s.timing]) byTiming[s.timing] = []; byTiming[s.timing].push(s); });
             
             Object.keys(byTiming).forEach(t => {
-                if (y > 270) { doc.addPage(); y = 20; }
-                doc.setFillColor(239, 246, 255);
-                doc.rect(20, y - 6, 170, 10, 'F');
-                doc.setTextColor(99, 102, 241);
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'bold');
-                doc.text(timingNames[t] || t, 25, y);
-                y += 15;
-                
+                text += `\n${t.toUpperCase()}:\n`;
+                text += "────────────────────────────────────────\n";
                 byTiming[t].forEach(s => {
-                    if (y > 270) { doc.addPage(); y = 20; }
-                    doc.setTextColor(30, 41, 59);
-                    doc.setFontSize(11);
-                    doc.setFont(undefined, 'bold');
-                    doc.text(s.name, 25, y);
-                    y += 6;
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(245, 158, 11);
-                    doc.text(`Dose: ${s.dose}`, 25, y);
-                    y += 10;
+                    text += `\n💊 ${s.name}\n`;
+                    text += `   Dose: ${s.dose}\n`;
+                    text += `   Why: ${s.why}\n`;
+                    const link = amazonLinks[s.name];
+                    if (link) text += `   Amazon: ${link}\n`;
                 });
-                y += 5;
             });
             
-            doc.save('BioStack-Pro-Protocol.pdf');
-            } catch (err) {
-                console.error('PDF Error:', err);
-                alert('PDF generation failed. Try Copy or Share instead.');
-            }
+            text += "\n\n═══════════════════════════════════════\n";
+            text += "  RETURNING CUSTOMER DISCOUNT\n";
+            text += "  Use code HALF50 for 50% off!\n";
+            text += "═══════════════════════════════════════\n";
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'BioStack-Pro-Protocol.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
+
 
         // Copy stack
         async function copyStack() {
