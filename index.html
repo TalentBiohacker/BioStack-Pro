@@ -1123,6 +1123,17 @@
             
             // Open Stripe with prefilled email
             window.open(stripeUrl + '?prefilled_email=' + encodeURIComponent(email), '_blank');
+            
+            // Show "I've paid" button
+            const payBtn = document.querySelector('#paywallModal .btn-success');
+            if (payBtn) {
+                payBtn.textContent = '✅ I\'ve Completed Payment';
+                payBtn.onclick = function() {
+                    closePaywall();
+                    showPaidResults();
+                    setTimeout(downloadPDF, 500);
+                };
+            }
         }
 
         function showPaidResults() {
