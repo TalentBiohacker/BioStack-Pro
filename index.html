@@ -746,7 +746,7 @@
                 <strong>💡 Tip:</strong> Selecting multiple goals combines supplements into one comprehensive daily protocol.
             </div>
 
-            <button class="btn btn-primary" id="btn1" onclick="goToStep2()" disabled>
+            <button class="btn btn-primary" id="btn1" onclick="document.getElementById('step1').classList.add('hidden'); document.getElementById('step2').classList.remove('hidden'); updateProgress(75, 'Step 3 of 4: Choose experience level');" disabled>
                 Continue to Experience Level →
             </button>
         </div>
@@ -771,7 +771,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary" id="btn2" onclick="generateStack()" disabled>
+            <button class="btn btn-primary" id="btn2" onclick="generateStack(); document.getElementById('step2').classList.add('hidden'); document.getElementById('step3').classList.remove('hidden'); updateProgress(100, 'Your personalized stack is ready!');" disabled>
                 Generate My Complete Stack 🧬
             </button>
             <button class="btn btn-secondary" onclick="goToStep1()" style="margin-top: 12px;">
