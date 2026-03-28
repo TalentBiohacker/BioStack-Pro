@@ -694,8 +694,8 @@
                 </div>
                 
                 <div class="accept-checkbox">
-                    <input type="checkbox" id="acceptCheck" onclick="toggleAccept(event)">
-                    <label for="acceptCheck" onclick="toggleAccept(event)">I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS</label>
+                    <input type="checkbox" id="acceptCheck" onchange="toggleAccept()">
+                    <label for="acceptCheck">I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS</label>
                 </div>
             </div>
             
@@ -1017,8 +1017,7 @@
         };
 
         // Toggle disclaimer accept
-        function toggleAccept(e) {
-            if (e) e.stopPropagation();
+        function toggleAccept() {
             const cb = document.getElementById('acceptCheck');
             accepted = cb.checked;
             document.getElementById('btn0').disabled = !accepted;
