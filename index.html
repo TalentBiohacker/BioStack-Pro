@@ -693,9 +693,9 @@
                     <p>You are purchasing a single PDF download (not ongoing app access). You keep the PDF file forever. The PDF will not update if the app changes later. No refunds after download. Discount codes cannot be combined.</p>
                 </div>
                 
-                <div class="accept-checkbox">
-                    <input type="checkbox" id="acceptCheck">
-                    <label for="acceptCheck">I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS</label>
+                <div class="accept-checkbox" onclick="document.getElementById('acceptCheck').click();">
+                    <input type="checkbox" id="acceptCheck" onclick="event.stopPropagation(); updateAcceptButton();">
+                    <label for="acceptCheck" onclick="event.stopPropagation();">I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS</label>
                 </div>
             </div>
             
@@ -963,9 +963,21 @@
                 acceptCheck.addEventListener('change', function() {
                     accepted = this.checked;
                     btn0.disabled = !accepted;
+                    console.log('Checkbox changed:', accepted);
                 });
             }
         });
+
+        // Also add inline function for onclick
+        function updateAcceptButton() {
+            const cb = document.getElementById('acceptCheck');
+            const btn = document.getElementById('btn0');
+            if (cb && btn) {
+                accepted = cb.checked;
+                btn.disabled = !accepted;
+                console.log('Button updated:', accepted, btn.disabled);
+            }
+        }
 
         // Amazon links
         const amazonLinks = {
