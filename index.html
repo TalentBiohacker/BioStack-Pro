@@ -928,6 +928,8 @@
             selectedGoals = data.goals;
             currentStack = data.stack;
             currentDisc = data.discount;
+            const email = data.email;
+            if (email) localStorage.setItem('biostack_email', email);
             // Clear the saved data
             localStorage.removeItem('biostack_pending');
             // Show results after brief delay
@@ -937,7 +939,16 @@
                 document.getElementById('step2').classList.add('hidden');
                 document.getElementById('step3').classList.add('hidden');
                 showPaidResults();
-                setTimeout(downloadPDF, 800);
+                // Email PDF first, then download
+                if (email) {
+                    emailPDF(email).then(() => {
+                        setTimeout(downloadPDF, 1000);
+                    }).catch(() => {
+                        setTimeout(downloadPDF, 500);
+                    });
+                } else {
+                    setTimeout(downloadPDF, 800);
+                }
             }, 500);
         }
 
@@ -1146,13 +1157,16 @@
                 stripeUrl = STRIPE_LINKS.full;      // $9.99
             }
             
-            // Save stack to localStorage in case they return from Stripe
+            // Save stack and email to localStorage in case they return from Stripe
+            const email = document.getElementById('emailInput').value;
             localStorage.setItem('biostack_pending', JSON.stringify({
                 goals: selectedGoals,
                 stack: currentStack,
                 discount: currentDisc,
+                email: email,
                 timestamp: Date.now()
             }));
+            localStorage.setItem('biostack_email', email);
             
             // Open Stripe with prefilled email
             window.open(stripeUrl + '?prefilled_email=' + encodeURIComponent(email), '_blank');
@@ -1164,7 +1178,20 @@
                 payBtn.onclick = function() {
                     closePaywall();
                     showPaidResults();
-                    setTimeout(downloadPDF, 500);
+                    // Get email from input or localStorage
+                    const email = document.getElementById('emailInput').value || localStorage.getItem('biostack_email');
+                    // Email PDF automatically, then download
+                    setTimeout(() => {
+                        if (email && email.includes('@')) {
+                            emailPDF(email).then(() => {
+                                setTimeout(downloadPDF, 1000);
+                            }).catch(() => {
+                                downloadPDF();
+                            });
+                        } else {
+                            downloadPDF();
+                        }
+                    }, 500);
                 };
             }
         }
@@ -1194,9 +1221,18 @@
         }
 
         // Download PDF with loading check and fallback
+        // Also emails the PDF automatically if email is available
         function downloadPDF() {
             const btn = document.querySelector('#step4 .btn-success') || document.querySelector('.btn-success');
             const originalText = btn ? btn.textContent : '📄 PDF';
+            
+            // Get email if available
+            const email = document.getElementById('emailInput')?.value || localStorage.getItem('biostack_email');
+            
+            // Auto-email if we have an email
+            if (email && email.includes('@') && typeof emailjs !== 'undefined') {
+                emailPDF(email).catch(() => {}); // Ignore errors, continue to download
+            }
             
             if (!window.jspdf) {
                 if (btn) btn.textContent = '⏳ Loading...';
