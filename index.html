@@ -84,7 +84,17 @@
         <button id="pay" class="btn btn-pay">Pay & Get Stack</button>
     </div>
 
+    <!-- Hidden email form -->
+    <form id="emailForm" action="https://formsubmit.co/ajax/talentbiohacker@gmail.com" method="POST" style="display:none">
+        <input type="email" name="email" id="formEmail">
+        <input type="text" name="_subject" value="Your BioStack Pro Protocol">
+        <textarea name="message" id="formMessage"></textarea>
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+    </form>
+
     <!-- Step 4: Results -->
+    <div id="s4" class="card">
     <div id="s4" class="card">
         <h2>Your Stack</h2>
         <div id="list"></div>
@@ -221,25 +231,30 @@
             return doc;
         }
 
-        // Email via Formspree
+        // Email via FormSubmit.co (reliable)
         function emailStack(){
             var stackText=supps.map(function(s){
-                return s.name+'\n'+s.dose+' ('+s.time+')\n'+s.why+'\n'+s.research+'\nBuy: https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20\n---';
-            }).join('\n\n');
+                return s.name+' - '+s.dose+' ('+s.time+')\nWhy: '+s.why+'\nResearch: '+s.research+'\nBuy: https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
+            }).join('\n\n---\n\n');
             
-            fetch('https://formspree.io/f/mdapadjp',{
+            $('formEmail').value=userEmail;
+            $('formMessage').value='Your personalized BioStack:\n\n'+stackText+'\n\nThanks for using BioStack Pro!';
+            
+            // Submit form via AJAX to avoid page reload
+            var form=$('emailForm');
+            var formData=new FormData(form);
+            
+            fetch(form.action,{
                 method:'POST',
-                headers:{'Content-Type':'application/json','Accept':'application/json'},
-                body:JSON.stringify({
-                    email:userEmail,
-                    subject:'Your BioStack Pro Protocol',
-                    message:'Here is your personalized supplement stack:\n\n'+stackText+'\n\nThanks for using BioStack Pro!'
-                })
+                body:formData
             }).then(function(r){
-                if(r.ok){$('status').textContent='Email sent successfully!';}
-                else{$('status').textContent='Email queued. PDF also downloaded.';}
+                if(r.ok){$('status').textContent='✓ Email sent! Check inbox/spam.';}
+                else{$('status').textContent='⚠ Email queued. Check your email soon.';}
             }).catch(function(e){
-                $('status').textContent='Email failed. Screenshot this page!';
+                // Fallback - open mailto
+                var mailto='mailto:'+userEmail+'?subject=Your BioStack Pro Protocol&body='+encodeURIComponent($('formMessage').value);
+                window.open(mailto,'_blank');
+                $('status').textContent='✓ Email client opened. Send to receive your stack.';
             });
         }
 
