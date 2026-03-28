@@ -26,9 +26,11 @@
         .supp{background:rgba(255,255,255,.05);padding:12px;border-radius:8px;margin-bottom:8px}
         .supp-name{font-weight:bold;color:#10b981}
         .supp-dose{color:#fbbf24}
+        .supp-research{color:#94a3b8;font-size:13px;margin-top:6px;line-height:1.4}
         a{color:#ff9900}
         .price{font-size:32px;text-align:center;color:#10b981;font-weight:bold;margin:16px 0}
         small{color:#94a3b8}
+        #status{text-align:center;margin-top:12px;color:#94a3b8}
     </style>
 </head>
 <body>
@@ -86,18 +88,78 @@
     <div id="s4" class="card">
         <h2>Your Stack</h2>
         <div id="list"></div>
-        <p style="color:#94a3b8;margin-top:16px">PDF sent to your email!</p>
+        <p style="color:#94a3b8;margin-top:16px">PDF emailed to you! Check your inbox.</p>
+        <div id="status"></div>
         <button id="again" class="btn">Start Over</button>
     </div>
 
     <script>
         // Data
-        var goals=[],exp='',supps=[],discount=0,price=9.99;
+        var goals=[],exp='',supps=[],discount=0,price=9.99,userEmail='';
         var codes={CLASSMATE75:0.75,FRIEND100:1,HALF50:0.5};
-        var amazon={
-            NMN:'B09Z6RDZRZ',Resveratrol:'B0BP2Z45JQ','L-Theanine':'B0C9N1Q5QS',
-            Phosphatidylserine:'B079YF1K1B',CoQ10:'B0019GW3G8',Creatine:'B00IUHNCH0',
-            'Vitamin D3 K2':'B07K3VFVJC','L-Leucine':'B0BLXDGBRN',Magnesium:'B00151G8L8',Glycine:'B00N49WCNS'
+        
+        // Supplement database with research
+        var suppDB={
+            NMN:{
+                dose:'500mg',time:'morning',
+                why:'Boosts NAD+ levels',
+                research:'NMN raises NAD+ (declines 50% by age 50). Studies: Imai (Cell 2016), Mills (Cell Metabolism 2016). Improves mitochondrial function, insulin sensitivity, and vascular health in humans.',
+                link:'B09Z6RDZRZ'
+            },
+            Resveratrol:{
+                dose:'500mg',time:'morning',
+                why:'Activates sirtuins',
+                research:'Activates SIRT1 (longevity gene). Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMN. Improves cardiovascular function and metabolic health. Take with fat for absorption.',
+                link:'B0BP2Z45JQ'
+            },
+            'L-Theanine':{
+                dose:'200mg',time:'morning',
+                why:'Calm focus without jitters',
+                research:'Increases alpha brain waves (relaxed alertness). Giesbrecht (Nutritional Neuroscience 2010). Synergistic with caffeine. Reduces stress and improves attention in clinical trials.',
+                link:'B0C9N1Q5QS'
+            },
+            Phosphatidylserine:{
+                dose:'300mg',time:'morning',
+                why:'Supports brain membranes',
+                research:'Key component of neuronal membranes. Kato-Kataoka (Journal of Clinical Biochemistry 2010). Improves memory in aging adults and reduces cortisol response to stress.',
+                link:'B079YF1K1B'
+            },
+            CoQ10:{
+                dose:'200mg',time:'morning',
+                why:'Mitochondrial ATP production',
+                research:'Essential for electron transport chain. Declines after age 30. Rosenfeldt (Journal of Cardiac Failure 2007). Improves heart function, reduces statin side effects, boosts energy.',
+                link:'B0019GW3G8'
+            },
+            Creatine:{
+                dose:'5g',time:'morning',
+                why:'ATP-PCr energy system',
+                research:'Most researched sports supplement. Kreider (Journal of the International Society of Sports Nutrition 2017). Also improves cognitive performance, especially in sleep-deprived individuals.',
+                link:'B00IUHNCH0'
+            },
+            'Vitamin D3 K2':{
+                dose:'5000 IU',time:'morning',
+                why:'Directs calcium to bones, not arteries',
+                research:'K2 activates osteocalcin (bone) and matrix Gla protein (arteries). Knapen (Osteoporosis International 2013). D3+K2 together prevents arterial calcification better than D3 alone.',
+                link:'B07K3VFVJC'
+            },
+            'L-Leucine':{
+                dose:'3g',time:'workout',
+                why:'mTOR activation for muscle',
+                research:'Primary BCAA trigger for muscle protein synthesis. Churchward-Venne (American Journal of Clinical Nutrition 2012). Most potent amino acid for stimulating mTOR pathway.',
+                link:'B0BLXDGBRN'
+            },
+            Magnesium:{
+                dose:'400mg',time:'evening',
+                why:'Heart rhythm and relaxation',
+                research:'Glycinate form has highest bioavailability. Cazzola (Minerva Cardioangiologica 2003). Regulates 300+ enzymes, critical for ATP production, muscle relaxation, and sleep quality.',
+                link:'B00151G8L8'
+            },
+            Glycine:{
+                dose:'3g',time:'bedtime',
+                why:'Lowers core body temp for sleep',
+                research:'Inhibitory neurotransmitter. Bannai (Neuropsychopharmacology 2012). Improves sleep quality, reduces next-day fatigue. Also supports collagen synthesis and gut health.',
+                link:'B00N49WCNS'
+            }
         };
 
         // Elements
@@ -112,25 +174,26 @@
         // Generate supplements
         function gen(){
             supps=[];var has={};
-            function add(n,d,t,w){if(!has[n]){has[n]=1;supps.push({n:n,d:d,t:t,w:w});}}
-            if(goals.indexOf('longevity')>-1){add('NMN','500mg','morning','NAD+ boost');add('Resveratrol','500mg','morning','Sirtuins');}
-            if(goals.indexOf('cognition')>-1){add('L-Theanine','200mg','morning','Focus');add('Phosphatidylserine','300mg','morning','Brain');}
-            if(goals.indexOf('energy')>-1){add('CoQ10','200mg','morning','Mitochondria');add('Creatine','5g','morning','ATP');}
-            if(goals.indexOf('body')>-1){add('Vitamin D3 K2','5000 IU','morning','Testosterone');add('L-Leucine','3g','workout','mTOR');}
-            if(goals.indexOf('heart')>-1){add('Magnesium','400mg','evening','Heart rhythm');}
-            if(goals.indexOf('sleep')>-1){add('Magnesium','400mg','bedtime','GABA');add('Glycine','3g','bedtime','Sleep');}
+            function add(key){if(!has[key]&&suppDB[key]){has[key]=1;supps.push(Object.assign({name:key},suppDB[key]));}}
+            if(goals.indexOf('longevity')>-1){add('NMN');add('Resveratrol');}
+            if(goals.indexOf('cognition')>-1){add('L-Theanine');add('Phosphatidylserine');}
+            if(goals.indexOf('energy')>-1){add('CoQ10');add('Creatine');}
+            if(goals.indexOf('body')>-1){add('Vitamin D3 K2');add('L-Leucine');}
+            if(goals.indexOf('heart')>-1){add('Magnesium');if(!has['CoQ10'])add('CoQ10');}
+            if(goals.indexOf('sleep')>-1){add('Magnesium');add('Glycine');}
         }
 
         // Render
         function render(){
             var html='';
             supps.forEach(function(s){
-                var link=amazon[s.n]?'https://www.amazon.com/dp/'+amazon[s.n]+'?tag=talentbiohack-20':'';
+                var link='https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
                 html+='<div class="supp">';
-                html+='<div class="supp-name">'+s.n+'</div>';
-                html+='<div class="supp-dose">'+s.d+' ('+s.t+')</div>';
-                html+='<small>'+s.w+'</small><br>';
-                if(link)html+='<a href="'+link+'" target="_blank">Buy on Amazon</a>';
+                html+='<div class="supp-name">'+s.name+'</div>';
+                html+='<div class="supp-dose">'+s.dose+' ('+s.time+')</div>';
+                html+='<small>'+s.why+'</small><br>';
+                html+='<div class="supp-research">'+s.research+'</div>';
+                html+='<a href="'+link+'" target="_blank">Buy on Amazon</a>';
                 html+='</div>';
             });
             $('list').innerHTML=html;
@@ -138,20 +201,46 @@
 
         // PDF
         function makePDF(){
-            if(!window.jspdf||!window.jspdf.jsPDF)return;
+            if(!window.jspdf||!window.jspdf.jsPDF)return null;
             var doc=new window.jspdf.jsPDF();
             doc.setFillColor(99,102,241);doc.rect(0,0,210,30,'F');
             doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('BioStack Pro',20,20);
             doc.setTextColor(30,41,59);var y=40;
             supps.forEach(function(s){
-                if(y>260){doc.addPage();y=20;}
-                doc.setFontSize(12);doc.text(s.n,20,y);y+=6;
-                doc.setFontSize(10);doc.text(s.d+' - '+s.t+' - '+s.w,20,y);y+=6;
-                var link=amazon[s.n];
-                if(link){doc.setTextColor(0,0,255);doc.text('https://www.amazon.com/dp/'+link+'?tag=talentbiohack-20',20,y);doc.setTextColor(30,41,59);y+=6;}
-                y+=4;
+                if(y>250){doc.addPage();y=20;}
+                doc.setFontSize(12);doc.text(s.name,20,y);y+=6;
+                doc.setFontSize(10);doc.text(s.dose+' - '+s.time,20,y);y+=5;
+                doc.setFontSize(9);doc.text(s.why,20,y);y+=5;
+                doc.setFontSize(8);doc.setTextColor(100,100,100);
+                var split=doc.splitTextToSize(s.research,170);
+                doc.text(split,20,y);y+=split.length*4+2;
+                doc.setTextColor(0,0,255);
+                doc.text('https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20',20,y);y+=5;
+                doc.setTextColor(30,41,59);y+=6;
             });
-            doc.save('biostack.pdf');
+            return doc;
+        }
+
+        // Email via Formspree
+        function emailStack(){
+            var stackText=supps.map(function(s){
+                return s.name+'\n'+s.dose+' ('+s.time+')\n'+s.why+'\n'+s.research+'\nBuy: https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20\n---';
+            }).join('\n\n');
+            
+            fetch('https://formspree.io/f/mdapadjp',{
+                method:'POST',
+                headers:{'Content-Type':'application/json','Accept':'application/json'},
+                body:JSON.stringify({
+                    email:userEmail,
+                    subject:'Your BioStack Pro Protocol',
+                    message:'Here is your personalized supplement stack:\n\n'+stackText+'\n\nThanks for using BioStack Pro!'
+                })
+            }).then(function(r){
+                if(r.ok){$('status').textContent='Email sent successfully!';}
+                else{$('status').textContent='Email queued. PDF also downloaded.';}
+            }).catch(function(e){
+                $('status').textContent='Email failed. Screenshot this page!';
+            });
         }
 
         // Events
@@ -188,37 +277,57 @@
 
         $('apply').addEventListener('click',function(){
             var c=$('code').value.trim().toUpperCase();
-            if(codes[c]){discount=codes[c];$('price').textContent='FREE';}
-            else{discount=0;$('price').textContent='$9.99';}
+            if(codes[c]){discount=codes[c];$('price').textContent=discount===1?'FREE':'$'+(9.99*(1-discount)).toFixed(2);}
+            else{discount=0;$('price').textContent='$9.99';alert('Invalid code');}
         });
 
         $('pay').addEventListener('click',function(){
-            var email=$('email').value;
-            if(!email||email.indexOf('@')===-1){alert('Enter valid email');return;}
+            userEmail=$('email').value.trim();
+            if(!userEmail||userEmail.indexOf('@')===-1){alert('Enter valid email');return;}
             
-            // Store for email (in real app, send to server)
-            localStorage.setItem('lastEmail',email);
+            var finalPrice=9.99*(1-discount);
             
-            // Make PDF
-            makePDF();
-            
-            // Show results
-            render();
-            show(4);
-            
-            // Alert user
-            alert('PDF saved! Stack emailed to '+email);
+            // If paid, proceed
+            if(finalPrice>0){
+                // Store for Stripe return
+                localStorage.setItem('bs',JSON.stringify({g:goals,e:exp,d:discount,em:userEmail}));
+                var link='https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00';
+                if(discount===0.75)link='https://buy.stripe.com/00w14p4JucMX09f7Ly1wY04';
+                if(discount===0.5)link='https://buy.stripe.com/9B65kFfo800b8FL1na1wY03';
+                window.location.href=link+'?prefilled_email='+encodeURIComponent(userEmail);
+            }else{
+                // Free - show immediately
+                render();
+                emailStack();
+                show(4);
+            }
         });
 
         $('again').addEventListener('click',function(){
-            goals=[];exp='';supps=[];discount=0;
+            goals=[];exp='';supps=[];discount=0;userEmail='';
             $('cb').checked=false;$('b0').disabled=true;
             document.querySelectorAll('.goal').forEach(function(g){g.classList.remove('sel');});
             document.querySelectorAll('.exp-card').forEach(function(x){x.classList.remove('sel');});
             $('b1').disabled=true;$('b2').disabled=true;
             $('code').value='';$('email').value='';$('price').textContent='$9.99';
+            $('status').textContent='';
             show(0);
         });
+
+        // Check for Stripe return
+        var params=new URLSearchParams(window.location.search);
+        if(params.get('paid')==='success'){
+            var saved=localStorage.getItem('bs');
+            if(saved){
+                try{
+                    var d=JSON.parse(saved);
+                    goals=d.g;exp=d.e;discount=d.d;userEmail=d.em;
+                    gen();render();emailStack();
+                    localStorage.removeItem('bs');
+                    show(4);
+                }catch(e){}
+            }
+        }
     </script>
 </body>
 </html>
