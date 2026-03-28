@@ -699,7 +699,7 @@
                 </div>
             </div>
             
-            <button class="btn btn-primary" id="btn0" onclick="goToStep1()" disabled>
+            <button class="btn btn-primary" id="btn0" onclick="document.getElementById('step0').classList.add('hidden'); document.getElementById('step1').classList.remove('hidden'); updateProgress(50, 'Step 2 of 4: Select your health goals');" disabled>
                 Continue to Goals →
             </button>
         </div>
