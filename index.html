@@ -449,12 +449,12 @@
             // Generate stack
             els.btn2.addEventListener('click', function() {
                 generateStack();
-                showStep(3);
+                showPaywall(); // Show paywall immediately, no preview
             });
 
             // Back buttons
             document.getElementById('back1').addEventListener('click', () => showStep(0));
-            document.getElementById('back2').addEventListener('click', () => showStep(2));
+            document.getElementById('back2').addEventListener('click', () => showStep(1));
 
             // Unlock/Pay
             els.btnUnlock.addEventListener('click', showPaywall);
@@ -477,7 +477,7 @@
                     currentStack = data.stack;
                     currentDisc = data.discount;
                     localStorage.removeItem('biostack_pending');
-                    showStep(4);
+                    showStep(3); // Show full stack (now step 3)
                     renderFullStack();
                 }
             }
@@ -487,15 +487,13 @@
             els.step0.classList.add('hidden');
             els.step1.classList.add('hidden');
             els.step2.classList.add('hidden');
-            els.step3.classList.add('hidden');
             els.step4.classList.add('hidden');
             
-            const progress = [25, 50, 75, 100, 100];
+            const progress = [25, 50, 75, 100];
             const texts = [
-                'Step 1 of 4: Accept terms',
-                'Step 2 of 4: Select goals',
-                'Step 3 of 4: Choose experience',
-                'Your personalized stack is ready!',
+                'Step 1 of 3: Accept terms',
+                'Step 2 of 3: Select goals',
+                'Step 3 of 3: Choose experience',
                 'Your complete protocol'
             ];
             
@@ -506,10 +504,6 @@
             if (n === 1) els.step1.classList.remove('hidden');
             if (n === 2) els.step2.classList.remove('hidden');
             if (n === 3) {
-                els.step3.classList.remove('hidden');
-                renderPreview();
-            }
-            if (n === 4) {
                 els.step4.classList.remove('hidden');
                 renderFullStack();
             }
@@ -610,7 +604,7 @@
             const price = (BASE_PRICE * (1 - currentDisc)).toFixed(2);
             if (price === '0.00') {
                 els.paywallModal.classList.add('hidden');
-                showStep(4);
+                showStep(3); // Show full stack (now step 3)
                 return;
             }
             
@@ -631,7 +625,7 @@
             els.btnPay.textContent = "✅ I've Completed Payment";
             els.btnPay.onclick = function() {
                 els.paywallModal.classList.add('hidden');
-                showStep(4);
+                showStep(3); // Show full stack (now step 3)
             };
         }
 
