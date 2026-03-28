@@ -892,6 +892,8 @@
 
     <script>
         // Payment config - Stripe links for each price point
+        // NOTE: Go to Stripe Dashboard > Payment Links > Edit each link > Add redirect URL:
+        // https://biostackpro.vercel.app/?paid=success
         const STRIPE_LINKS = {
             full: 'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00',      // $9.99
             half: 'https://buy.stripe.com/9B65kFfo800b8FL1na1wY03',      // $5.00 (half50)
@@ -915,6 +917,29 @@
         let currentStack = [];
         let currentDisc = 0;
         const BASE_PRICE = 9.99;
+
+        // Check if user returned from successful Stripe payment
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedStack = localStorage.getItem('biostack_pending');
+        
+        if (urlParams.get('paid') === 'success' && savedStack) {
+            // User just paid - restore stack and auto-unlock
+            const data = JSON.parse(savedStack);
+            selectedGoals = data.goals;
+            currentStack = data.stack;
+            currentDisc = data.discount;
+            // Clear the saved data
+            localStorage.removeItem('biostack_pending');
+            // Show results after brief delay
+            setTimeout(() => {
+                document.getElementById('step0').classList.add('hidden');
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.add('hidden');
+                document.getElementById('step3').classList.add('hidden');
+                showPaidResults();
+                setTimeout(downloadPDF, 800);
+            }, 500);
+        }
 
         // Amazon links
         const amazonLinks = {
@@ -1120,6 +1145,14 @@
             } else {
                 stripeUrl = STRIPE_LINKS.full;      // $9.99
             }
+            
+            // Save stack to localStorage in case they return from Stripe
+            localStorage.setItem('biostack_pending', JSON.stringify({
+                goals: selectedGoals,
+                stack: currentStack,
+                discount: currentDisc,
+                timestamp: Date.now()
+            }));
             
             // Open Stripe with prefilled email
             window.open(stripeUrl + '?prefilled_email=' + encodeURIComponent(email), '_blank');
