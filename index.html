@@ -1,346 +1,471 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioStack Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root{--p:#6366f1;--s:#8b5cf6;--a:#ec4899;--b:#0f172a;--c:#1e293b;--t:#f8fafc;--l:#94a3b8;--d:#334155;--ok:#10b981}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--b);color:var(--t);min-height:100vh;line-height:1.6}
-        .wrap{max-width:600px;margin:0 auto;padding:20px}
-        .head{text-align:center;padding:30px 0}
-        .head h1{font-size:2.5rem;background:linear-gradient(135deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .card{background:var(--c);border-radius:16px;padding:24px;margin-bottom:20px;border:1px solid var(--d)}
-        .hid{display:none!important}
-        .btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:16px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff}
-        .btn:disabled{opacity:.5;cursor:not-allowed}
-        .btn-s{background:var(--d)}
-        .btn-ok{background:linear-gradient(135deg,var(--ok),#059669)}
-        .prog{height:8px;background:var(--d);border-radius:4px;margin-bottom:8px}
-        .prog>div{height:100%;background:linear-gradient(90deg,var(--p),var(--s));border-radius:4px;transition:.3s}
-        .disc{max-height:300px;overflow-y:auto;background:rgba(0,0,0,.2);padding:16px;border-radius:8px;margin-bottom:16px;font-size:.9rem}
-        .disc h4{color:var(--a);margin:12px 0 8px}
-        .disc p{color:var(--l);margin-bottom:8px}
+        body{font-family:sans-serif;background:#0f172a;color:#f8fafc;max-width:600px;margin:0 auto;padding:20px}
+        .card{background:#1e293b;border-radius:16px;padding:24px;margin-bottom:20px;border:1px solid #334155}
+        .hid{display:none}
+        .btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+        .btn:disabled{opacity:.5}
+        .btn-g{background:#10b981}
+        .btn-gray{background:#334155}
+        .goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+        .goal-card{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:16px;text-align:center;cursor:pointer}
+        .goal-card.sel{border-color:#10b981;background:rgba(16,185,129,.1)}
+        .exp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:20px 0}
+        .exp-card{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:16px;text-align:center;cursor:pointer}
+        .exp-card.sel{border-color:#10b981;background:rgba(16,185,129,.1)}
+        .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+        .modal-hid{display:none}
+        .modal-content{background:#1e293b;border-radius:16px;padding:24px;max-width:400px;width:100%;text-align:center}
         .acc{display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,.05);border-radius:8px;margin-bottom:16px;cursor:pointer}
         .acc input{width:24px;height:24px}
-        .gg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
-        .gc{background:var(--b);border:2px solid var(--d);border-radius:12px;padding:16px;text-align:center;cursor:pointer}
-        .gc:hover{border-color:var(--p)}
-        .gc.sel{border-color:var(--ok);background:rgba(16,185,129,.1)}
-        .gi{font-size:2rem;margin-bottom:8px}
-        .gt{font-weight:600;font-size:.9rem}
-        .gd{font-size:.75rem;color:var(--l);margin-top:4px}
-        .eg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:20px 0}
-        .ec{background:var(--b);border:2px solid var(--d);border-radius:12px;padding:16px 8px;text-align:center;cursor:pointer}
-        .ec:hover{border-color:var(--p)}
-        .ec.sel{border-color:var(--ok);background:rgba(16,185,129,.1)}
-        .ei{font-size:1.5rem;margin-bottom:4px}
-        .et{font-weight:600;font-size:.85rem}
-        .tm{margin-bottom:20px}
-        .th{background:var(--b);padding:12px;border-radius:8px;font-weight:600;margin-bottom:12px}
-        .si{display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:8px}
-        .si h4{font-size:1rem}
-        .sd{color:var(--ok);font-size:.9rem}
-        .sw{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-        .mod{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
-        .mc{background:var(--c);border-radius:16px;padding:24px;max-width:400px;width:100%;text-align:center}
-        .mi{font-size:3rem;margin-bottom:16px}
-        .pr{font-size:2.5rem;font-weight:700;color:var(--ok);margin:20px 0}
-        .di{display:flex;gap:8px;margin:16px 0}
-        .di input{flex:1;padding:12px;border:1px solid var(--d);background:var(--b);color:var(--t);border-radius:8px}
-        .di button{padding:12px 20px;background:var(--p);color:#fff;border:none;border-radius:8px;font-weight:600}
-        .em{width:100%;padding:14px;border:1px solid var(--d);background:var(--b);color:var(--t);border-radius:8px;margin:12px 0}
-        .fl{text-align:left;margin:16px 0}
-        .fl li{margin-bottom:8px;color:var(--l)}
-        .preview-note{color:var(--l);font-size:.9rem;margin:12px 0;padding:12px;background:rgba(255,255,255,.05);border-radius:8px}
+        .disc{max-height:300px;overflow-y:auto;background:rgba(0,0,0,.2);padding:16px;border-radius:8px;margin-bottom:16px;font-size:.9rem}
+        input[type="text"],input[type="email"]{width:100%;padding:12px;border:1px solid #334155;background:#0f172a;color:#f8fafc;border-radius:8px;margin:8px 0}
+        .price{font-size:2.5rem;font-weight:700;color:#10b981;margin:20px 0}
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="head"><h1>BioStack Pro</h1><p>Personalized Supplement Protocol</p></div>
-        <div class="prog"><div id="pf" style="width:33%"></div></div>
-        <div id="pt" style="text-align:center;color:var(--l);margin-bottom:20px">Step 1 of 3: Accept terms</div>
-
-        <!-- Step 0 -->
-        <div class="card" id="s0">
-            <h2>Medical Disclaimer</h2>
-            <div class="disc">
-                <p><strong>1. Not Medical Advice:</strong> This app provides educational info only, not medical advice.</p>
-                <p><strong>2. Consult Provider:</strong> Always consult a healthcare provider before starting supplements.</p>
-                <p><strong>3. FDA Disclaimer:</strong> Supplements are not FDA approved to diagnose, treat, cure, or prevent disease.</p>
-                <p><strong>4. Results Vary:</strong> Individual results may vary.</p>
-                <p><strong>5. Age 18+:</strong> This app is for adults 18 and older.</p>
-            </div>
-            <div class="acc" id="ar"><input type="checkbox" id="ac"><label for="ac">I HAVE READ AND ACCEPT THESE TERMS</label></div>
-            <button class="btn" id="b0" disabled>Continue to Goals</button>
+    <!-- Step 0: Disclaimer -->
+    <div id="step0" class="card">
+        <h2>Medical Disclaimer</h2>
+        <div class="disc">
+            <p><strong>Not Medical Advice:</strong> This app provides educational info only.</p>
+            <p><strong>Consult Provider:</strong> Always consult a healthcare provider before starting supplements.</p>
+            <p><strong>FDA Disclaimer:</strong> Supplements are not FDA approved to diagnose, treat, cure, or prevent disease.</p>
         </div>
-
-        <!-- Step 1 -->
-        <div class="card hid" id="s1">
-            <h2>Select Your Goals</h2>
-            <p style="color:var(--l);margin-bottom:16px">Choose one or more:</p>
-            <div class="gg" id="gl">
-                <div class="gc" data-g="longevity"><div class="gi">DNA</div><div class="gt">Longevity</div><div class="gd">Anti-aging</div></div>
-                <div class="gc" data-g="cognition"><div class="gi">BRAIN</div><div class="gt">Cognition</div><div class="gd">Memory & focus</div></div>
-                <div class="gc" data-g="energy"><div class="gi">BOLT</div><div class="gt">Energy</div><div class="gd">Mitochondria</div></div>
-                <div class="gc" data-g="body"><div class="gi">MUSCLE</div><div class="gt">Body</div><div class="gd">Muscle & metabolism</div></div>
-                <div class="gc" data-g="heart"><div class="gi">HEART</div><div class="gt">Heart</div><div class="gd">Cardiovascular</div></div>
-                <div class="gc" data-g="sleep"><div class="gi">SLEEP</div><div class="gt">Sleep</div><div class="gd">Recovery</div></div>
-            </div>
-            <button class="btn" id="b1" disabled>Continue to Experience</button>
+        <div class="acc" id="acceptRow">
+            <input type="checkbox" id="acceptCheck">
+            <label for="acceptCheck">I HAVE READ AND ACCEPT THESE TERMS</label>
         </div>
+        <button id="btn0" class="btn" disabled>Continue to Goals</button>
+    </div>
 
-        <!-- Step 2 -->
-        <div class="card hid" id="s2">
-            <h2>Experience Level</h2>
-            <p style="color:var(--l);margin-bottom:16px">Select your supplement experience:</p>
-            <div class="eg" id="el">
-                <div class="ec" data-e="beginner"><div class="ei">START</div><div class="et">Beginner</div></div>
-                <div class="ec" data-e="intermediate"><div class="ei">MID</div><div class="et">Intermediate</div></div>
-                <div class="ec" data-e="advanced"><div class="ei">PRO</div><div class="et">Advanced</div></div>
-            </div>
-            <button class="btn" id="b2" disabled>Generate My Stack</button>
-            <button class="btn btn-s" id="bk1">Back</button>
+    <!-- Step 1: Goals -->
+    <div id="step1" class="card hid">
+        <h2>Select Your Goals</h2>
+        <p style="color:#94a3b8">Choose one or more:</p>
+        <div class="goal-grid">
+            <div class="goal-card" data-goal="longevity"><div style="font-size:2rem">DNA</div><div><strong>Longevity</strong></div></div>
+            <div class="goal-card" data-goal="cognition"><div style="font-size:2rem">BRAIN</div><div><strong>Cognition</strong></div></div>
+            <div class="goal-card" data-goal="energy"><div style="font-size:2rem">BOLT</div><div><strong>Energy</strong></div></div>
+            <div class="goal-card" data-goal="body"><div style="font-size:2rem">MUSCLE</div><div><strong>Body</strong></div></div>
+            <div class="goal-card" data-goal="heart"><div style="font-size:2rem">HEART</div><div><strong>Heart</strong></div></div>
+            <div class="goal-card" data-goal="sleep"><div style="font-size:2rem">SLEEP</div><div><strong>Sleep</strong></div></div>
         </div>
+        <button id="btn1" class="btn" disabled>Continue to Experience</button>
+    </div>
 
-        <!-- Paywall Modal -->
-        <div class="mod hid" id="pw">
-            <div class="mc">
-                <div class="mi">PDF</div>
-                <h3>Unlock Your Complete Stack Guide</h3>
-                <p style="color:var(--l)">Get the full PDF with dosages, timing & Amazon links</p>
-                <div class="pr" id="pd">$9.99</div>
-                <div class="di"><input type="text" id="dc" placeholder="Enter code"><button id="ba">Apply</button></div>
-                <div id="dm" style="margin:8px 0;font-size:.9rem"></div>
-                <ul class="fl"><li>Complete supplement schedule</li><li>Exact dosages & timing</li><li>Amazon purchase links</li><li>Print-friendly format</li></ul>
-                <input type="email" class="em" id="ei" placeholder="Enter your email">
-                <button class="btn btn-ok" id="bp">Pay & Get PDF</button>
-                <p class="preview-note">Or view a limited preview below (no PDF download)</p>
-                <button class="btn btn-s" id="bc">View Preview</button>
-            </div>
+    <!-- Step 2: Experience -->
+    <div id="step2" class="card hid">
+        <h2>Experience Level</h2>
+        <p style="color:#94a3b8">Select your supplement experience:</p>
+        <div class="exp-grid">
+            <div class="exp-card" data-exp="beginner"><div>🌱</div><div><strong>Beginner</strong></div></div>
+            <div class="exp-card" data-exp="intermediate"><div>🌿</div><div><strong>Intermediate</strong></div></div>
+            <div class="exp-card" data-exp="advanced"><div>🚀</div><div><strong>Advanced</strong></div></div>
         </div>
+        <button id="btn2" class="btn" disabled>Generate My Stack</button>
+        <button id="back1" class="btn btn-gray">Back</button>
+    </div>
 
-        <!-- Step 3: Preview (Limited) -->
-        <div class="card hid" id="s3">
-            <h2>Your Stack Preview</h2>
-            <div class="preview-note"><strong>Limited Preview:</strong> Supplement names only. Unlock for full details, dosages & Amazon links.</div>
-            <div id="fs"></div>
-            <button class="btn btn-ok" id="bunlock" style="margin-top:20px">Unlock Full PDF ($9.99)</button>
-            <button class="btn btn-s" id="br2" style="margin-top:12px">New Stack</button>
-        </div>
-
-        <!-- Step 4: Unlocked Full Stack -->
-        <div class="card hid" id="s4">
-            <h2>Your Complete Protocol</h2>
-            <div id="fsfull"></div>
-            <div style="margin-top:20px;padding:20px;background:var(--b);border-radius:12px;border:2px dashed var(--d)">
-                <h3 style="text-align:center;margin-bottom:15px">Save Your Stack</h3>
-                <div class="sw">
-                    <button class="btn btn-s" id="bx">Share</button>
-                    <button class="btn btn-s" id="bcy">Copy</button>
-                    <button class="btn btn-ok" id="bd">Download PDF</button>
-                    <button class="btn" id="be" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">Email PDF</button>
-                </div>
-            </div>
-            <button class="btn btn-s" id="br" style="margin-top:20px">New Stack</button>
+    <!-- Paywall Modal -->
+    <div id="paywall" class="modal modal-hid">
+        <div class="modal-content">
+            <div style="font-size:3rem">📄</div>
+            <h3>Unlock Your Complete Stack</h3>
+            <div class="price" id="price">$9.99</div>
+            <input type="text" id="discInput" placeholder="Enter code">
+            <button id="btnApply" class="btn btn-gray" style="margin-top:8px">Apply Code</button>
+            <div id="discMsg" style="margin:8px 0"></div>
+            <input type="email" id="emailInput" placeholder="Enter your email">
+            <button id="btnPay" class="btn btn-g">Pay & Get PDF</button>
+            <button id="btnPreview" class="btn btn-gray">View Preview</button>
         </div>
     </div>
 
+    <!-- Step 3: Preview -->
+    <div id="step3" class="card hid">
+        <h2>Stack Preview (Limited)</h2>
+        <p style="color:#94a3b8">Supplement names only. Unlock for full details.</p>
+        <div id="previewContent"></div>
+        <button id="btnUnlock" class="btn btn-g">Unlock Full PDF ($9.99)</button>
+        <button id="btnNew1" class="btn btn-gray">New Stack</button>
+    </div>
+
+    <!-- Step 4: Full Stack -->
+    <div id="step4" class="card hid">
+        <h2>Your Complete Protocol</h2>
+        <div id="fullContent"></div>
+        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <button id="btnShare" class="btn btn-gray">Share</button>
+            <button id="btnCopy" class="btn btn-gray">Copy</button>
+            <button id="btnDownload" class="btn btn-g">Download PDF</button>
+            <button id="btnEmail" class="btn">Email PDF</button>
+        </div>
+        <button id="btnNew2" class="btn btn-gray" style="margin-top:12px">New Stack</button>
+    </div>
+
     <script>
-    (function(){
-        // Config
-        var SL={full:'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00',half:'https://buy.stripe.com/9B65kFfo800b8FL1na1wY03',disc:'https://buy.stripe.com/00w14p4JucMX09f7Ly1wY04'};
-        var DC={'CLASSMATE75':{d:0.75,msg:'75% off! Pay $2.50'},'FRIEND100':{d:1,msg:'FREE!'},'HALF50':{d:0.5,msg:'50% off! Pay $5.00'}};
-        var BP=9.99,AT='talentbiohack-20';
-        
-        // State
-        var acc=false,sg=[],ex='',cd=0,cs=[],em='',isPaid=false;
-        
-        // Amazon links
-        var al={'NMN':'https://www.amazon.com/dp/B09Z6RDZRZ?tag='+AT,'Resveratrol':'https://www.amazon.com/dp/B0BP2Z45JQ?tag='+AT,'L-Theanine':'https://www.amazon.com/dp/B0C9N1Q5QS?tag='+AT,'Phosphatidylserine':'https://www.amazon.com/dp/B079YF1K1B?tag='+AT,'CoQ10':'https://www.amazon.com/dp/B0019GW3G8?tag='+AT,'Creatine':'https://www.amazon.com/dp/B00IUHNCH0?tag='+AT,'Vitamin D3 K2':'https://www.amazon.com/dp/B07K3VFVJC?tag='+AT,'L-Leucine':'https://www.amazon.com/dp/B0BLXDGBRN?tag='+AT,'Magnesium Glycinate':'https://www.amazon.com/dp/B00151G8L8?tag='+AT,'Glycine':'https://www.amazon.com/dp/B00N49WCNS?tag='+AT};
-        
-        // Elements
-        var e={
-            s0:document.getElementById('s0'),s1:document.getElementById('s1'),s2:document.getElementById('s2'),s3:document.getElementById('s3'),s4:document.getElementById('s4'),
-            pw:document.getElementById('pw'),fs:document.getElementById('fs'),fsfull:document.getElementById('fsfull'),pf:document.getElementById('pf'),pt:document.getElementById('pt'),
-            ac:document.getElementById('ac'),b0:document.getElementById('b0'),b1:document.getElementById('b1'),b2:document.getElementById('b2'),bunlock:document.getElementById('bunlock'),
-            gl:document.getElementById('gl'),el:document.getElementById('el'),pd:document.getElementById('pd'),dc:document.getElementById('dc'),
-            ba:document.getElementById('ba'),dm:document.getElementById('dm'),ei:document.getElementById('ei'),bp:document.getElementById('bp'),
-            bc:document.getElementById('bc'),bx:document.getElementById('bx'),bcy:document.getElementById('bcy'),bd:document.getElementById('bd'),
-            be:document.getElementById('be'),br:document.getElementById('br'),br2:document.getElementById('br2'),bk1:document.getElementById('bk1')
-        };
-        
-        // Show step
-        function show(n){
-            e.s0.classList.add('hid');e.s1.classList.add('hid');e.s2.classList.add('hid');e.s3.classList.add('hid');e.s4.classList.add('hid');
-            var p=[33,66,100,100,100],t=['Step 1 of 3: Accept terms','Step 2 of 3: Select goals','Step 3 of 3: Choose experience','Stack Preview (Limited)','Your Complete Protocol'];
-            e.pf.style.width=p[n]+'%';e.pt.textContent=t[n];
-            if(n===0)e.s0.classList.remove('hid');
-            if(n===1)e.s1.classList.remove('hid');
-            if(n===2)e.s2.classList.remove('hid');
-            if(n===3){e.s3.classList.remove('hid');renderPreview();}
-            if(n===4){e.s4.classList.remove('hid');renderFull();}
+    // Simple direct JavaScript - no fancy patterns
+    var accepted = false;
+    var goals = [];
+    var experience = '';
+    var stack = [];
+    var discount = 0;
+    var email = '';
+
+    // Config
+    var prices = {full:9.99,half:5.00,discount:2.50};
+    var discCodes = {
+        'CLASSMATE75':0.75,
+        'FRIEND100':1.0,
+        'HALF50':0.5
+    };
+    var stripeLinks = {
+        full:'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00',
+        half:'https://buy.stripe.com/9B65kFfo800b8FL1na1wY03',
+        discount:'https://buy.stripe.com/00w14p4JucMX09f7Ly1wY04'
+    };
+    var amazonTag = 'talentbiohack-20';
+
+    // Get elements
+    var el = {};
+    ['step0','step1','step2','step3','step4','paywall','acceptCheck','btn0','btn1','btn2','back1',
+     'discInput','btnApply','discMsg','price','emailInput','btnPay','btnPreview','previewContent',
+     'fullContent','btnUnlock','btnNew1','btnShare','btnCopy','btnDownload','btnEmail','btnNew2',
+     'acceptRow'].forEach(function(id){el[id]=document.getElementById(id);});
+
+    // Event: Accept checkbox
+    el.acceptCheck.addEventListener('change',function(){
+        accepted = this.checked;
+        el.btn0.disabled = !accepted;
+    });
+    el.acceptRow.addEventListener('click',function(e){
+        if(e.target !== el.acceptCheck){
+            el.acceptCheck.checked = !el.acceptCheck.checked;
+            el.acceptCheck.dispatchEvent(new Event('change'));
         }
-        
-        // Generate stack (deduplicated)
-        function gen(){
-            cs=[];
-            var has={};
-            function add(s){if(!has[s.n]){has[s.n]=true;cs.push(s);}}
-            
-            if(sg.indexOf('longevity')>-1){add({n:'NMN',d:'500mg',t:'morning',w:'Boosts NAD+'});add({n:'Resveratrol',d:'500mg',t:'morning',w:'Activates sirtuins'});}
-            if(sg.indexOf('cognition')>-1){add({n:'L-Theanine',d:'200mg',t:'morning',w:'Calm focus'});add({n:'Phosphatidylserine',d:'300mg',t:'morning',w:'Brain membranes'});}
-            if(sg.indexOf('energy')>-1){add({n:'CoQ10',d:'200mg',t:'morning',w:'Mitochondrial ATP'});add({n:'Creatine',d:'5g',t:'morning',w:'ATP-PCr system'});}
-            if(sg.indexOf('body')>-1){add({n:'Vitamin D3 K2',d:'5000 IU',t:'morning',w:'Testosterone & calcium'});add({n:'L-Leucine',d:'3g',t:'workout',w:'mTOR activation'});}
-            if(sg.indexOf('heart')>-1){add({n:'Magnesium Glycinate',d:'400mg',t:'evening',w:'Heart rhythm & BP'});}
-            if(sg.indexOf('sleep')>-1){add({n:'Magnesium Glycinate',d:'400mg',t:'bedtime',w:'GABA activation'});add({n:'Glycine',d:'3g',t:'bedtime',w:'Lowers core temp'});}
+    });
+
+    // Event: Continue to goals
+    el.btn0.addEventListener('click',function(){
+        if(accepted){
+            el.step0.classList.add('hid');
+            el.step1.classList.remove('hid');
         }
-        
-        // Render limited preview (names only)
-        function renderPreview(){
-            var bt={},h='',t,s;
-            for(var i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
-            var keys=Object.keys(bt);
-            for(var k=0;k<keys.length;k++){t=keys[k];h+='<div class="tm"><div class="th">'+t.toUpperCase()+'</div>';for(var j=0;j<bt[t].length;j++){s=bt[t][j];h+='<div class="si"><div><h4>'+s.n+'</h4></div></div>';}h+='</div>';}
-            e.fs.innerHTML=h;
-        }
-        
-        // Render full stack (with links)
-        function renderFull(){
-            var bt={},h='',t,s,lk;
-            for(var i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
-            var keys=Object.keys(bt);
-            for(var k=0;k<keys.length;k++){t=keys[k];h+='<div class="tm"><div class="th">'+t.toUpperCase()+'</div>';for(var j=0;j<bt[t].length;j++){s=bt[t][j];lk=al[s.n];h+='<div class="si"><div><h4>'+s.n+'</h4><div class="sd">'+s.d+'</div><div style="color:var(--l);font-size:.85rem;margin-top:4px">'+s.w+'</div>'+(lk?'<a href="'+lk+'" target="_blank" style="color:#ff9900;font-size:.85rem">Amazon</a>':'')+'</div></div>';}h+='</div>';}
-            e.fsfull.innerHTML=h;
-        }
-        
-        function up(){var pr=(BP*(1-cd)).toFixed(2);e.pd.textContent=pr==='0.00'?'FREE':'$'+pr;}
-        
-        // PDF generation (FIXED - no textWithLink)
-        function pdf(){
-            if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF library not loaded. Please refresh.');return false;}
-            try{
-                var jsPDF=window.jspdf.jsPDF,doc=new jsPDF();
-                doc.setFillColor(99,102,241);doc.rect(0,0,210,40,'F');
-                doc.setTextColor(255,255,255);doc.setFontSize(24);doc.text('BioStack Pro',20,25);
-                doc.setTextColor(30,41,59);var y=50;
-                var bt={},t,s,lk,i,j,keys,k;
-                for(i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
-                keys=Object.keys(bt);
-                for(k=0;k<keys.length;k++){t=keys[k];doc.setFontSize(14);doc.text(t.toUpperCase(),20,y);y+=8;for(j=0;j<bt[t].length;j++){s=bt[t][j];doc.setFontSize(11);doc.text(s.n,25,y);y+=5;doc.setFontSize(9);doc.text(s.d+' - '+s.w,25,y);y+=5;lk=al[s.n];if(lk){doc.setTextColor(0,0,255);doc.text('Buy on Amazon: '+lk,25,y);doc.setTextColor(30,41,59);y+=5;}y+=3;if(y>270){doc.addPage();y=20;}}y+=5;}
-                doc.save('BioStack-Pro.pdf');
-                return true;
-            }catch(err){alert('PDF error: '+err.message);return false;}
-        }
-        
-        // Event listeners
-        e.ac.addEventListener('change',function(){acc=e.ac.checked;e.b0.disabled=!acc;});
-        e.ar.addEventListener('click',function(ev){if(ev.target!==e.ac)e.ac.click();});
-        
-        e.b0.addEventListener('click',function(){if(acc)show(1);});
-        
-        var gcs=e.gl.querySelectorAll('.gc');
-        for(var i=0;i<gcs.length;i++){
-            gcs[i].addEventListener('click',function(){
-                var g=this.dataset.g,idx=sg.indexOf(g);
-                if(idx>-1){this.classList.remove('sel');sg.splice(idx,1);}
-                else{this.classList.add('sel');sg.push(g);}
-                e.b1.disabled=sg.length===0;
-            });
-        }
-        
-        e.b1.addEventListener('click',function(){if(sg.length>0)show(2);});
-        
-        var ecs=e.el.querySelectorAll('.ec');
-        for(var j=0;j<ecs.length;j++){
-            ecs[j].addEventListener('click',function(){
-                for(var k=0;k<ecs.length;k++)ecs[k].classList.remove('sel');
-                this.classList.add('sel');ex=this.dataset.e;e.b2.disabled=false;
-            });
-        }
-        
-        e.b2.addEventListener('click',function(){if(!ex)return;gen();e.pw.classList.remove('hid');up();});
-        
-        e.bk1.addEventListener('click',function(){show(1);});
-        
-        // View Preview button - shows limited preview
-        e.bc.addEventListener('click',function(){e.pw.classList.add('hid');show(3);});
-        
-        // Unlock from preview
-        e.bunlock.addEventListener('click',function(){e.pw.classList.remove('hid');up();});
-        
-        e.br2.addEventListener('click',function(){reset();show(0);});
-        
-        e.ba.addEventListener('click',function(){
-            var c=e.dc.value.trim().toUpperCase();
-            if(DC[c]){cd=DC[c].d;e.dm.textContent=DC[c].msg;e.dm.style.color='#10b981';}
-            else{cd=0;e.dm.textContent='Invalid code';e.dm.style.color='#ef4444';}
-            up();
-        });
-        
-        e.bp.addEventListener('click',function(){
-            em=e.ei.value;if(!em||em.indexOf('@')===-1){alert('Please enter a valid email');return;}
-            var pr=(BP*(1-cd)).toFixed(2);
-            if(pr==='0.00'){isPaid=true;e.pw.classList.add('hid');show(4);return;}
-            localStorage.setItem('bs',JSON.stringify({g:sg,x:ex,s:cs,d:cd,e:em,paid:false}));
-            var u=SL.full;if(cd===0.75)u=SL.disc;if(cd===0.5)u=SL.half;
-            window.open(u+'?prefilled_email='+encodeURIComponent(em),'_blank');
-            e.bp.textContent="I've Completed Payment";
-            e.bp.onclick=function(){isPaid=true;e.pw.classList.add('hid');show(4);};
-        });
-        
-        // Share
-        e.bx.addEventListener('click',function(){
-            var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');
-            if(navigator.share){navigator.share({title:'My BioStack',text:t});}
-            else{alert('Share:\n'+t);}
-        });
-        
-        // Copy
-        e.bcy.addEventListener('click',function(){
-            var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');
-            if(navigator.clipboard){
-                navigator.clipboard.writeText(t).then(function(){alert('Copied!');},function(){alert('Copy:\n'+t);});
-            }else{alert('Copy:\n'+t);}
-        });
-        
-        // Download PDF
-        e.bd.addEventListener('click',pdf);
-        
-        // Email PDF
-        e.be.addEventListener('click',function(){
-            var to=prompt('Enter your email:');
-            if(to&&to.indexOf('@')>-1){
-                if(pdf()){alert('PDF saved! Email it to: '+to);}
+    });
+
+    // Event: Goal selection
+    document.querySelectorAll('.goal-card').forEach(function(card){
+        card.addEventListener('click',function(){
+            var g = this.dataset.goal;
+            var i = goals.indexOf(g);
+            if(i > -1){
+                goals.splice(i,1);
+                this.classList.remove('sel');
+            }else{
+                goals.push(g);
+                this.classList.add('sel');
             }
+            el.btn1.disabled = goals.length === 0;
         });
-        
-        // Reset
-        function reset(){
-            acc=false;sg=[];ex='';cd=0;cs=[];em='';isPaid=false;
-            e.ac.checked=false;e.b0.disabled=true;
-            var allG=e.gl.querySelectorAll('.gc');for(var m=0;m<allG.length;m++)allG[m].classList.remove('sel');
-            var allE=e.el.querySelectorAll('.ec');for(var n=0;n<allE.length;n++)allE[n].classList.remove('sel');
-            e.b1.disabled=true;e.b2.disabled=true;
-            e.dc.value='';e.dm.textContent='';e.ei.value='';
-            e.bp.textContent='Pay & Get PDF';
-            e.bp.onclick=null;
+    });
+
+    // Event: Continue to experience
+    el.btn1.addEventListener('click',function(){
+        if(goals.length > 0){
+            el.step1.classList.add('hid');
+            el.step2.classList.remove('hid');
         }
+    });
+
+    // Event: Back from experience
+    el.back1.addEventListener('click',function(){
+        el.step2.classList.add('hid');
+        el.step1.classList.remove('hid');
+    });
+
+    // Event: Experience selection
+    document.querySelectorAll('.exp-card').forEach(function(card){
+        card.addEventListener('click',function(){
+            document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});
+            this.classList.add('sel');
+            experience = this.dataset.exp;
+            el.btn2.disabled = false;
+        });
+    });
+
+    // Event: Generate stack
+    el.btn2.addEventListener('click',function(){
+        if(!experience)return;
+        generateStack();
+        el.paywall.classList.remove('modal-hid');
+    });
+
+    // Generate stack function
+    function generateStack(){
+        stack = [];
+        var has = {};
+        function add(s){if(!has[s.name]){has[s.name]=true;stack.push(s);}}
         
-        e.br.addEventListener('click',function(){reset();show(0);});
-        
-        // Check for Stripe return
-        var upm=new URLSearchParams(window.location.search);
-        if(upm.get('paid')==='success'){
-            var sv=localStorage.getItem('bs');
-            if(sv){
-                var d=JSON.parse(sv);sg=d.g;ex=d.x;cs=d.s;cd=d.d;em=d.e;isPaid=true;
-                localStorage.removeItem('bs');show(4);
-            }
+        if(goals.indexOf('longevity')>-1){
+            add({name:'NMN',dose:'500mg',time:'morning',why:'Boosts NAD+',link:'B09Z6RDZRZ'});
+            add({name:'Resveratrol',dose:'500mg',time:'morning',why:'Activates sirtuins',link:'B0BP2Z45JQ'});
         }
-    })();
+        if(goals.indexOf('cognition')>-1){
+            add({name:'L-Theanine',dose:'200mg',time:'morning',why:'Calm focus',link:'B0C9N1Q5QS'});
+            add({name:'Phosphatidylserine',dose:'300mg',time:'morning',why:'Brain membranes',link:'B079YF1K1B'});
+        }
+        if(goals.indexOf('energy')>-1){
+            add({name:'CoQ10',dose:'200mg',time:'morning',why:'Mitochondrial ATP',link:'B0019GW3G8'});
+            add({name:'Creatine',dose:'5g',time:'morning',why:'ATP-PCr system',link:'B00IUHNCH0'});
+        }
+        if(goals.indexOf('body')>-1){
+            add({name:'Vitamin D3 K2',dose:'5000 IU',time:'morning',why:'Testosterone & calcium',link:'B07K3VFVJC'});
+            add({name:'L-Leucine',dose:'3g',time:'workout',why:'mTOR activation',link:'B0BLXDGBRN'});
+        }
+        if(goals.indexOf('heart')>-1){
+            add({name:'Magnesium Glycinate',dose:'400mg',time:'evening',why:'Heart rhythm & BP',link:'B00151G8L8'});
+        }
+        if(goals.indexOf('sleep')>-1){
+            add({name:'Magnesium Glycinate',dose:'400mg',time:'bedtime',why:'GABA activation',link:'B00151G8L8'});
+            add({name:'Glycine',dose:'3g',time:'bedtime',why:'Lowers core temp',link:'B00N49WCNS'});
+        }
+    }
+
+    // Event: Apply discount
+    el.btnApply.addEventListener('click',function(){
+        var code = el.discInput.value.trim().toUpperCase();
+        if(discCodes[code]){
+            discount = discCodes[code];
+            el.discMsg.textContent = code === 'FRIEND100' ? 'FREE!' : (discount*100) + '% off!';
+            el.discMsg.style.color = '#10b981';
+        }else{
+            discount = 0;
+            el.discMsg.textContent = 'Invalid code';
+            el.discMsg.style.color = '#ef4444';
+        }
+        updatePrice();
+    });
+
+    function updatePrice(){
+        var p = (9.99 * (1-discount)).toFixed(2);
+        el.price.textContent = p === '0.00' ? 'FREE' : '$' + p;
+    }
+
+    // Event: Pay
+    el.btnPay.addEventListener('click',function(){
+        email = el.emailInput.value;
+        if(!email || email.indexOf('@') === -1){
+            alert('Please enter a valid email');
+            return;
+        }
+        var p = (9.99 * (1-discount)).toFixed(2);
+        if(p === '0.00'){
+            el.paywall.classList.add('modal-hid');
+            showFullStack();
+            return;
+        }
+        localStorage.setItem('biostack_data',JSON.stringify({goals:goals,exp:experience,stack:stack,discount:discount,email:email}));
+        var link = stripeLinks.full;
+        if(discount === 0.75)link = stripeLinks.discount;
+        if(discount === 0.5)link = stripeLinks.half;
+        window.open(link + '?prefilled_email=' + encodeURIComponent(email),'_blank');
+        el.btnPay.textContent = "I've Completed Payment";
+    });
+
+    // Event: View Preview
+    el.btnPreview.addEventListener('click',function(){
+        el.paywall.classList.add('modal-hid');
+        showPreview();
+    });
+
+    function showPreview(){
+        el.step2.classList.add('hid');
+        el.step3.classList.remove('hid');
+        var html = '';
+        var byTime = {};
+        stack.forEach(function(s){
+            if(!byTime[s.time])byTime[s.time]=[];
+            byTime[s.time].push(s);
+        });
+        Object.keys(byTime).forEach(function(t){
+            html += '<div style="margin-bottom:16px"><div style="background:#0f172a;padding:12px;border-radius:8px;font-weight:600">' + t.toUpperCase() + '</div>';
+            byTime[t].forEach(function(s){
+                html += '<div style="padding:12px;background:rgba(255,255,255,.03);border-radius:8px;margin-top:8px"><strong>' + s.name + '</strong></div>';
+            });
+            html += '</div>';
+        });
+        el.previewContent.innerHTML = html;
+    }
+
+    // Event: Unlock from preview
+    el.btnUnlock.addEventListener('click',function(){
+        el.paywall.classList.remove('modal-hid');
+    });
+
+    // Event: New Stack from preview
+    el.btnNew1.addEventListener('click',function(){
+        resetAll();
+    });
+
+    function showFullStack(){
+        el.paywall.classList.add('modal-hid');
+        el.step2.classList.add('hid');
+        el.step3.classList.add('hid');
+        el.step4.classList.remove('hid');
+        var html = '';
+        var byTime = {};
+        stack.forEach(function(s){
+            if(!byTime[s.time])byTime[s.time]=[];
+            byTime[s.time].push(s);
+        });
+        Object.keys(byTime).forEach(function(t){
+            html += '<div style="margin-bottom:16px"><div style="background:#0f172a;padding:12px;border-radius:8px;font-weight:600">' + t.toUpperCase() + '</div>';
+            byTime[t].forEach(function(s){
+                var link = 'https://www.amazon.com/dp/' + s.link + '?tag=' + amazonTag;
+                html += '<div style="padding:12px;background:rgba(255,255,255,.03);border-radius:8px;margin-top:8px">';
+                html += '<strong>' + s.name + '</strong><br>';
+                html += '<span style="color:#f59e0b">' + s.dose + '</span><br>';
+                html += '<span style="color:#94a3b8;font-size:.9rem">' + s.why + '</span><br>';
+                html += '<a href="' + link + '" target="_blank" style="color:#ff9900;font-size:.9rem">Amazon</a>';
+                html += '</div>';
+            });
+            html += '</div>';
+        });
+        el.fullContent.innerHTML = html;
+    }
+
+    // Event: Share
+    el.btnShare.addEventListener('click',function(){
+        var text = stack.map(function(s){return s.name + ': ' + s.dose;}).join('\n');
+        if(navigator.share){
+            navigator.share({title:'My BioStack',text:text});
+        }else{
+            alert(text);
+        }
+    });
+
+    // Event: Copy
+    el.btnCopy.addEventListener('click',function(){
+        var text = stack.map(function(s){return s.name + ': ' + s.dose;}).join('\n');
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(text).then(function(){alert('Copied!');});
+        }else{
+            alert(text);
+        }
+    });
+
+    // Event: Download PDF
+    el.btnDownload.addEventListener('click',function(){
+        if(!window.jspdf || !window.jspdf.jsPDF){
+            alert('PDF library loading... please wait and try again.');
+            return;
+        }
+        try{
+            var jsPDF = window.jspdf.jsPDF;
+            var doc = new jsPDF();
+            doc.setFillColor(99,102,241);
+            doc.rect(0,0,210,40,'F');
+            doc.setTextColor(255,255,255);
+            doc.setFontSize(24);
+            doc.text('BioStack Pro',20,25);
+            doc.setTextColor(30,41,59);
+            var y = 50;
+            var byTime = {};
+            stack.forEach(function(s){
+                if(!byTime[s.time])byTime[s.time]=[];
+                byTime[s.time].push(s);
+            });
+            Object.keys(byTime).forEach(function(t){
+                doc.setFontSize(14);
+                doc.text(t.toUpperCase(),20,y);
+                y += 8;
+                byTime[t].forEach(function(s){
+                    doc.setFontSize(11);
+                    doc.text(s.name,25,y);
+                    y += 5;
+                    doc.setFontSize(9);
+                    doc.text(s.dose + ' - ' + s.why,25,y);
+                    y += 5;
+                    var link = 'https://www.amazon.com/dp/' + s.link + '?tag=' + amazonTag;
+                    doc.setTextColor(0,0,255);
+                    doc.text('Buy: ' + link,25,y);
+                    doc.setTextColor(30,41,59);
+                    y += 8;
+                    if(y > 270){
+                        doc.addPage();
+                        y = 20;
+                    }
+                });
+                y += 5;
+            });
+            doc.save('BioStack-Pro.pdf');
+        }catch(err){
+            alert('PDF error: ' + err.message);
+        }
+    });
+
+    // Event: Email
+    el.btnEmail.addEventListener('click',function(){
+        var to = prompt('Enter your email:');
+        if(to && to.indexOf('@') > -1){
+            // Trigger download first
+            el.btnDownload.click();
+            alert('PDF downloaded! Please attach it to an email to: ' + to);
+        }
+    });
+
+    // Event: New Stack from full view
+    el.btnNew2.addEventListener('click',function(){
+        resetAll();
+    });
+
+    function resetAll(){
+        accepted = false;
+        goals = [];
+        experience = '';
+        stack = [];
+        discount = 0;
+        email = '';
+        el.acceptCheck.checked = false;
+        el.btn0.disabled = true;
+        document.querySelectorAll('.goal-card').forEach(function(c){c.classList.remove('sel');});
+        document.querySelectorAll('.exp-card').forEach(function(c){c.classList.remove('sel');});
+        el.btn1.disabled = true;
+        el.btn2.disabled = true;
+        el.discInput.value = '';
+        el.discMsg.textContent = '';
+        el.emailInput.value = '';
+        el.price.textContent = '$9.99';
+        el.btnPay.textContent = 'Pay & Get PDF';
+        el.step1.classList.add('hid');
+        el.step2.classList.add('hid');
+        el.step3.classList.add('hid');
+        el.step4.classList.add('hid');
+        el.step0.classList.remove('hid');
+    }
+
+    // Check for Stripe return
+    var params = new URLSearchParams(window.location.search);
+    if(params.get('paid') === 'success'){
+        var saved = localStorage.getItem('biostack_data');
+        if(saved){
+            var d = JSON.parse(saved);
+            goals = d.goals;
+            experience = d.exp;
+            stack = d.stack;
+            discount = d.discount;
+            email = d.email;
+            localStorage.removeItem('biostack_data');
+            showFullStack();
+        }
+    }
     </script>
 </body>
 </html>
