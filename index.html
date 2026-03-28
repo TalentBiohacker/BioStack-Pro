@@ -694,7 +694,7 @@
                 </div>
                 
                 <div class="accept-checkbox">
-                    <input type="checkbox" id="acceptCheck" onchange="toggleAccept()">
+                    <input type="checkbox" id="acceptCheck">
                     <label for="acceptCheck">I HAVE READ, UNDERSTAND, AND ACCEPT THESE TERMS</label>
                 </div>
             </div>
@@ -954,6 +954,18 @@
             // Normal visit - ensure step0 is visible
             document.getElementById('step0').classList.remove('hidden');
         }
+
+        // Setup disclaimer checkbox listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const acceptCheck = document.getElementById('acceptCheck');
+            const btn0 = document.getElementById('btn0');
+            if (acceptCheck && btn0) {
+                acceptCheck.addEventListener('change', function() {
+                    accepted = this.checked;
+                    btn0.disabled = !accepted;
+                });
+            }
+        });
 
         // Amazon links
         const amazonLinks = {
