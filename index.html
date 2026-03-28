@@ -1318,15 +1318,9 @@
 
         // Email PDF using Formspree (simple!)
         // 1. Go to formspree.io, create account, copy your form ID
-        // 2. Replace "mdapadjp" below with your actual ID (e.g., "xgvvenky")
+        // 2. Replace "mdapadjp" below with your actual ID
         async function emailPDF(toEmail) {
-            const FORMSPREE_ID = 'mdapadjp'; // <-- CHANGE THIS
-            
-            if (FORMSPREE_ID === 'mdapadjp') {
-                alert('Email not set up yet. Downloading PDF instead...');
-                downloadPDF();
-                return;
-            }
+            const FORMSPREE_ID = 'mdapadjp';
             
             const btn = document.querySelector('#step4 .btn-success') || document.querySelector('.btn-success');
             if (btn) btn.textContent = '📧 Sending...';
