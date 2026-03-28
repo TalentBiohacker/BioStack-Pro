@@ -950,6 +950,9 @@
                     setTimeout(downloadPDF, 800);
                 }
             }, 500);
+        } else {
+            // Normal visit - ensure step0 is visible
+            document.getElementById('step0').classList.remove('hidden');
         }
 
         // Amazon links
