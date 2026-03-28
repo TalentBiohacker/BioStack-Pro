@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioStack Pro</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body{font-family:sans-serif;background:#0f172a;color:#f8fafc;max-width:500px;margin:0 auto;padding:20px}
         .card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;display:none}
@@ -18,25 +17,25 @@
         .row input{width:20px;height:20px}
         .goals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
         .goal{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:16px;text-align:center;cursor:pointer}
-        .goal.sel{border-color:#10b981}
+        .goal.sel{border-color:#10b981;background:rgba(16,185,129,.1)}
         .exp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
         .exp-card{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:16px;text-align:center;cursor:pointer}
-        .exp-card.sel{border-color:#10b981}
+        .exp-card.sel{border-color:#10b981;background:rgba(16,185,129,.1)}
         input[type="email"]{width:100%;padding:14px;border:1px solid #334155;background:#0f172a;color:#fff;border-radius:8px;margin:12px 0;font-size:16px}
-        .supp{background:rgba(255,255,255,.05);padding:12px;border-radius:8px;margin-bottom:8px}
-        .supp-name{font-weight:bold;color:#10b981}
+        .supp{background:rgba(255,255,255,.05);padding:12px;border-radius:8px;margin-bottom:8px;border-left:4px solid #6366f1}
+        .supp-name{font-weight:bold;color:#10b981;font-size:16px}
         .supp-dose{color:#fbbf24}
+        .supp-goal{font-size:11px;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:10px;text-transform:uppercase}
         .supp-research{color:#94a3b8;font-size:13px;margin-top:6px;line-height:1.4}
         a{color:#ff9900}
         .price{font-size:32px;text-align:center;color:#10b981;font-weight:bold;margin:16px 0}
         small{color:#94a3b8}
-        #status{text-align:center;margin-top:12px;color:#94a3b8}
+        .time-header{background:linear-gradient(90deg,#10b981,#059669);color:white;padding:12px 16px;border-radius:8px;font-weight:bold;text-transform:uppercase;margin-bottom:12px}
     </style>
 </head>
 <body>
     <h1>BioStack Pro</h1>
 
-    <!-- Step 0: Disclaimer -->
     <div id="s0" class="card active">
         <h2>Medical Disclaimer</h2>
         <div class="disc">
@@ -49,7 +48,6 @@
         <button id="b0" class="btn" disabled>Continue</button>
     </div>
 
-    <!-- Step 1: Goals -->
     <div id="s1" class="card">
         <h2>Select Your Goals</h2>
         <div class="goals">
@@ -63,7 +61,6 @@
         <button id="b1" class="btn" disabled>Continue</button>
     </div>
 
-    <!-- Step 2: Experience -->
     <div id="s2" class="card">
         <h2>Experience Level</h2>
         <div class="exp">
@@ -74,7 +71,6 @@
         <button id="b2" class="btn" disabled>Continue</button>
     </div>
 
-    <!-- Step 3: Pay -->
     <div id="s3" class="card">
         <h2>Get Your Stack</h2>
         <div class="price" id="price">$9.99</div>
@@ -84,282 +80,84 @@
         <button id="pay" class="btn btn-pay">Pay & Get Stack</button>
     </div>
 
-    <!-- Step 4: Results -->
     <div id="s4" class="card">
         <h2>Your Stack</h2>
         <div id="list"></div>
-        
-        <!-- Email Form - Visible and Submits for Real -->
-        <form id="emailForm" action="https://formsubmit.co/talentbiohacker@gmail.com" method="POST" style="margin-top:20px;padding:16px;background:rgba(0,0,0,.3);border-radius:12px">
+        <p style="color:#94a3b8;margin:16px 0;text-align:center">Enter your email below to receive this stack:</p>
+        <form action="https://formsubmit.co/talentbiohacker@gmail.com" method="POST">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_template" value="table">
             <input type="hidden" name="_subject" value="Your BioStack Pro Protocol">
             <input type="hidden" name="_next" value="https://biostackpro.vercel.app?emailed=true">
-            
-            <p style="margin-bottom:12px;color:#94a3b8">Enter your email to receive this stack:</p>
             <input type="email" name="email" id="formEmail" placeholder="your@email.com" required style="width:100%;padding:12px;margin-bottom:12px;background:#0f172a;border:1px solid #334155;color:#fff;border-radius:8px">
-            
             <textarea name="message" id="formMessage" style="display:none"></textarea>
-            
             <button type="submit" class="btn" style="background:#6366f1">📧 Email Me This Stack</button>
         </form>
-        
         <button id="again" class="btn" style="margin-top:12px;background:#334155">Start Over</button>
     </div>
 
     <script>
-        // Data
-        var goals=[],exp='',supps=[],discount=0,price=9.99,userEmail='';
+        var goals=[],exp='',supps=[],discount=0,userEmail='';
         var codes={CLASSMATE75:0.75,FRIEND100:1,HALF50:0.5};
         
-        // Supplement database with research - EXPANDED
-        var suppDB={
-            // LONGEVITY
-            NMNH:{
-                dose:'250mg',time:'morning',goal:'Longevity',
-                why:'Next-gen NAD+ booster (2x better than NMN)',
-                research:'NMNH (Reduced NMN) has superior bioavailability and stability. Converts directly to NAD+ more efficiently than standard NMN. Lower dose needed for same effect.',
-                link:'B0D7L2G9X8'
-            },
-            Resveratrol:{
-                dose:'500mg',time:'morning',goal:'Longevity',
-                why:'Activates sirtuins (SIRT1)',
-                research:'Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMNH. Improves cardiovascular function and metabolic health. Take with fat.',
-                link:'B0BP2Z45JQ'
-            },
-            Quercetin:{
-                dose:'500mg',time:'morning',goal:'Longevity',
-                why:'Senolytic - clears zombie cells',
-                research:'Harrison (Nature Medicine 2018). Removes senescent cells. Extends healthspan. Synergistic with Dasatinib for senolytic protocol.',
-                link:'B01CUYHCX6'
-            },
-            'TMG (Betaine)':{
-                dose:'500mg',time:'morning',goal:'Longevity',
-                why:'Methyl donor for NAD+ support',
-                research:'Prevents methylation depletion when taking NAD+ precursors. Ensures proper homocysteine metabolism. Supports liver function.',
-                link:'B08M99BR1N'
-            },
-            Spermidine:{
-                dose:'10mg',time:'morning',goal:'Longevity',
-                why:'Induces autophagy',
-                research:'Madeo (Nature Medicine 2018). Triggers cellular cleanup. Improves cardiovascular function and memory in older adults.',
-                link:'B09J7C185Q'
-            },
-            // COGNITION
-            'L-Theanine':{
-                dose:'200mg',time:'morning',goal:'Cognition',
-                why:'Calm focus without jitters',
-                research:'Giesbrecht (Nutritional Neuroscience 2010). Increases alpha brain waves. Synergistic with caffeine. Reduces stress, improves attention.',
-                link:'B0C9N1Q5QS'
-            },
-            Phosphatidylserine:{
-                dose:'300mg',time:'morning',goal:'Cognition',
-                why:'Brain membrane support',
-                research:'Kato-Kataoka (J Clinical Biochemistry 2010). Key neuronal membrane component. Improves memory and reduces cortisol response.',
-                link:'B079YF1K1B'
-            },
-            'Alpha-GPC':{
-                dose:'300mg',time:'morning',goal:'Cognition',
-                why:'Choline for acetylcholine',
-                research:'Canal (Clinical Therapeutics 1993). Rapidly crosses blood-brain barrier. Improves memory, focus, and growth hormone response.',
-                link:'B09QKJHCQW'
-            },
-            'Lion\'s Mane':{
-                dose:'1000mg',time:'morning',goal:'Cognition',
-                why:'Nerve Growth Factor stimulation',
-                research:'Mori (Biological & Pharmaceutical Bulletin 2009). Promotes NGF synthesis. Improves mild cognitive impairment and mood.',
-                link:'B01JZN35MM'
-            },
-            // ENERGY
-            CoQ10:{
-                dose:'200mg',time:'morning',goal:'Energy',
-                why:'Mitochondrial ATP production',
-                research:'Rosenfeldt (J Cardiac Failure 2007). Essential for electron transport. Declines after age 30. Improves heart function and energy.',
-                link:'B0019GW3G8'
-            },
-            Creatine:{
-                dose:'5g',time:'morning',goal:'Energy',
-                why:'ATP-PCr energy system',
-                research:'Kreider (JISSN 2017). Most researched sports supplement. Improves cognitive performance, especially when sleep-deprived.',
-                link:'B00IUHNCH0'
-            },
-            'PQQ (Pyrroloquinoline)':{
-                dose:'20mg',time:'morning',goal:'Energy',
-                why:'Mitochondrial biogenesis',
-                research:'Harris (Food Style 2011). Stimulates growth of NEW mitochondria. Improves cognitive function and fatigue.',
-                link:'B00B0W3ZOS'
-            },
-            'B-Complex':{
-                dose:'1 tablet',time:'morning',goal:'Energy',
-                why:'Cofactors for energy metabolism',
-                research:'Kennedy (Psychopharmacology 2016). Essential for ATP production, methylation, and neurotransmitter synthesis.',
-                link:'B00QEXZK4Y'
-            },
-            // BODY
-            'Vitamin D3 K2':{
-                dose:'5000 IU',time:'morning',goal:'Body',
-                why:'Directs calcium to bones',
-                research:'Knapen (Osteoporosis International 2013). K2 activates osteocalcin and matrix Gla protein. Prevents arterial calcification.',
-                link:'B07K3VFVJC'
-            },
-            'L-Leucine':{
-                dose:'3g',time:'workout',goal:'Body',
-                why:'mTOR activation for muscle',
-                research:'Churchward-Venne (AJCN 2012). Primary BCAA trigger for muscle protein synthesis. Most potent mTOR stimulator.',
-                link:'B00E7S7CW8'
-            },
-            'Omega-3 (EPA/DHA)':{
-                dose:'2000mg',time:'morning',goal:'Body',
-                why:'Anti-inflammatory, muscle recovery',
-                research:'Philpott (Int J Sport Nutr Exerc Metab 2018). Reduces exercise-induced inflammation. Supports muscle protein synthesis.',
-                link:'B014LDT0ZM'
-            },
-            'Boron':{
-                dose:'3mg',time:'morning',goal:'Body',
-                why:'Testosterone and bone health',
-                research:'Naghii (J Trace Elem Med Biol 2011). Increases free testosterone. Improves vitamin D and magnesium absorption.',
-                link:'B08P5261VX'
-            },
-            // HEART
-            'Magnesium Glycinate':{
-                dose:'400mg',time:'evening',goal:'Heart',
-                why:'Heart rhythm and BP',
-                research:'Cazzola (Minerva Cardioangiologica 2003). Regulates 300+ enzymes. Critical for ATP, muscle relaxation, blood pressure.',
-                link:'B00151G8L8'
-            },
-            'Garlic Extract':{
-                dose:'600mg',time:'evening',goal:'Heart',
-                why:'Blood pressure support',
-                research:'Ried (European Journal of Clinical Nutrition 2013). Reduces blood pressure comparable to some medications. Improves cholesterol.',
-                link:'B000NPYY04'
-            },
-            'Hawthorn Berry':{
-                dose:'500mg',time:'evening',goal:'Heart',
-                why:'Cardiac function support',
-                research:'Pittler (Cochrane Database 2008). Improves heart failure symptoms. Increases coronary blood flow.',
-                link:'B000WS3AMQ'
-            },
-            'Aged Black Garlic':{
-                dose:'600mg',time:'evening',goal:'Heart',
-                why:'Nitric oxide boost',
-                research:'Nakagawa (J Nutr 2016). Rich in S-allylcysteine. Improves arterial stiffness and blood pressure.',
-                link:'B00NUX7F1Y'
-            },
-            // SLEEP
-            Glycine:{
-                dose:'3g',time:'bedtime',goal:'Sleep',
-                why:'Lowers core body temp',
-                research:'Bannai (Neuropsychopharmacology 2012). Inhibitory neurotransmitter. Improves sleep quality, reduces next-day fatigue.',
-                link:'B00N49WCNS'
-            },
-            'L-Theanine (PM)':{
-                dose:'200mg',time:'bedtime',goal:'Sleep',
-                why:'GABA enhancement',
-                research:'Kim (Pharmaceutical Biology 2019). Promotes relaxation without sedation. Improves sleep onset and quality.',
-                link:'B0C9N1Q5QS'
-            },
-            Apigenin:{
-                dose:'50mg',time:'bedtime',goal:'Sleep',
-                why:'Calming flavonoid',
-                research:'Chamomile extract compound. Binds to benzodiazepine receptors. Reduces anxiety and promotes sleep without habituation.',
-                link:'B09WQWCP9K'
-            },
-            'Myo-Inositol':{
-                dose:'2000mg',time:'bedtime',goal:'Sleep',
-                why:'Sleep quality and insulin',
-                research:'Beem (JCEM 1999). Improves sleep quality, reduces nighttime awakenings. Also supports insulin sensitivity.',
-                link:'B00MRG3YP4'
-            }
-        };
-                link:'B00PQYTLXM'
-            },
-            'Aged Black Garlic':{
-                dose:'600mg',time:'evening',goal:'Heart',
-                why:'Nitric oxide boost',
-                research:'Nakagawa (J Nutr 2016). Rich in S-allylcysteine. Improves arterial stiffness and blood pressure.',
-                link:'B0BLXDGBRN'
-            },
-            // SLEEP
-            Glycine:{
-                dose:'3g',time:'bedtime',goal:'Sleep',
-                why:'Lowers core body temp',
-                research:'Bannai (Neuropsychopharmacology 2012). Inhibitory neurotransmitter. Improves sleep quality, reduces next-day fatigue.',
-                link:'B00N49WCNS'
-            },
-            'L-Theanine (PM)':{
-                dose:'200mg',time:'bedtime',goal:'Sleep',
-                why:'GABA enhancement',
-                research:'Kim (Pharmaceutical Biology 2019). Promotes relaxation without sedation. Improves sleep onset and quality.',
-                link:'B0C9N1Q5QS'
-            },
-            'Apigenin':{
-                dose:'50mg',time:'bedtime',goal:'Sleep',
-                why:'Calming flavonoid',
-                research:'Chamomile extract compound. Binds to benzodiazepine receptors. Reduces anxiety and promotes sleep without habituation.',
-                link:'B09Z6RDZRZ'
-            },
-            'Myo-Inositol':{
-                dose:'2000mg',time:'bedtime',goal:'Sleep',
-                why:'Sleep quality and insulin',
-                research:'Beem (JCEM 1999). Improves sleep quality, reduces nighttime awakenings. Also supports insulin sensitivity.',
-                link:'B0019GW3G8'
-            }
-        };
-
-        // Elements
         function $(id){return document.getElementById(id);}
-
-        // Navigation
+        
         function show(step){
             document.querySelectorAll('.card').forEach(function(c){c.classList.remove('active');});
             $('s'+step).classList.add('active');
         }
-
-        // Generate supplements - 4 per goal
+        
+        var suppDB={
+            NMNH:{name:'NMNH',dose:'250mg',time:'morning',goal:'Longevity',why:'Next-gen NAD+ booster',research:'NMNH has superior bioavailability vs NMN. Converts directly to NAD+ more efficiently.',link:'B0D7L2G9X8'},
+            Resveratrol:{name:'Resveratrol',dose:'500mg',time:'morning',goal:'Longevity',why:'Activates sirtuins',research:'Activates SIRT1 longevity gene. Synergistic with NMNH. Improves cardiovascular function.',link:'B0BP2Z45JQ'},
+            Quercetin:{name:'Quercetin',dose:'500mg',time:'morning',goal:'Longevity',why:'Senolytic',research:'Removes senescent cells. Extends healthspan. Synergistic with Dasatinib.',link:'B01CUYHCX6'},
+            TMG:{name:'TMG (Betaine)',dose:'500mg',time:'morning',goal:'Longevity',why:'Methyl donor',research:'Prevents methylation depletion with NAD+ boosters. Supports liver function.',link:'B08M99BR1N'},
+            Spermidine:{name:'Spermidine',dose:'10mg',time:'morning',goal:'Longevity',why:'Induces autophagy',research:'Triggers cellular cleanup. Improves cardiovascular function and memory.',link:'B09J7C185Q'},
+            LTheanine:{name:'L-Theanine',dose:'200mg',time:'morning',goal:'Cognition',why:'Calm focus',research:'Increases alpha brain waves. Synergistic with caffeine. Reduces stress.',link:'B0C9N1Q5QS'},
+            Phosphatidylserine:{name:'Phosphatidylserine',dose:'300mg',time:'morning',goal:'Cognition',why:'Brain membrane support',research:'Key neuronal membrane component. Improves memory and reduces cortisol.',link:'B079YF1K1B'},
+            AlphaGPC:{name:'Alpha-GPC',dose:'300mg',time:'morning',goal:'Cognition',why:'Choline source',research:'Rapidly crosses blood-brain barrier. Improves memory and growth hormone.',link:'B09QKJHCQW'},
+            LionsMane:{name:'Lions Mane',dose:'1000mg',time:'morning',goal:'Cognition',why:'NGF stimulation',research:'Promotes Nerve Growth Factor synthesis. Improves cognitive impairment.',link:'B01JZN35MM'},
+            CoQ10:{name:'CoQ10',dose:'200mg',time:'morning',goal:'Energy',why:'Mitochondrial ATP',research:'Essential for electron transport. Declines after age 30. Heart and energy support.',link:'B0019GW3G8'},
+            Creatine:{name:'Creatine',dose:'5g',time:'morning',goal:'Energy',why:'ATP system',research:'Most researched sports supplement. Improves cognitive performance.',link:'B00IUHNCH0'},
+            PQQ:{name:'PQQ',dose:'20mg',time:'morning',goal:'Energy',why:'New mitochondria',research:'Stimulates mitochondrial biogenesis. Improves cognitive function.',link:'B00B0W3ZOS'},
+            BComplex:{name:'B-Complex',dose:'1 tablet',time:'morning',goal:'Energy',why:'Energy cofactors',research:'Essential for ATP production, methylation, neurotransmitter synthesis.',link:'B00QEXZK4Y'},
+            D3K2:{name:'Vitamin D3 K2',dose:'5000 IU',time:'morning',goal:'Body',why:'Calcium direction',research:'K2 directs calcium to bones not arteries. Prevents arterial calcification.',link:'B07K3VFVJC'},
+            Leucine:{name:'L-Leucine',dose:'3g',time:'workout',goal:'Body',why:'mTOR activation',research:'Primary BCAA trigger for muscle protein synthesis. Most potent mTOR stimulator.',link:'B00E7S7CW8'},
+            Omega3:{name:'Omega-3',dose:'2000mg',time:'morning',goal:'Body',why:'Anti-inflammatory',research:'Reduces exercise-induced inflammation. Supports muscle protein synthesis.',link:'B014LDT0ZM'},
+            Boron:{name:'Boron',dose:'3mg',time:'morning',goal:'Body',why:'Testosterone support',research:'Increases free testosterone. Improves vitamin D and magnesium absorption.',link:'B08P5261VX'},
+            Magnesium:{name:'Magnesium Glycinate',dose:'400mg',time:'evening',goal:'Heart',why:'Heart rhythm',research:'Regulates 300+ enzymes. Critical for ATP, muscle relaxation, blood pressure.',link:'B00151G8L8'},
+            Garlic:{name:'Garlic Extract',dose:'600mg',time:'evening',goal:'Heart',why:'Blood pressure',research:'Reduces blood pressure comparable to medications. Improves cholesterol.',link:'B000NPYY04'},
+            Hawthorn:{name:'Hawthorn Berry',dose:'500mg',time:'evening',goal:'Heart',why:'Cardiac support',research:'Improves heart failure symptoms. Increases coronary blood flow.',link:'B000WS3AMQ'},
+            BlackGarlic:{name:'Aged Black Garlic',dose:'600mg',time:'evening',goal:'Heart',why:'Nitric oxide',research:'Rich in S-allylcysteine. Improves arterial stiffness and blood pressure.',link:'B00NUX7F1Y'},
+            Glycine:{name:'Glycine',dose:'3g',time:'bedtime',goal:'Sleep',why:'Lowers body temp',research:'Inhibitory neurotransmitter. Improves sleep quality, reduces fatigue.',link:'B00N49WCNS'},
+            LTheaninePM:{name:'L-Theanine PM',dose:'200mg',time:'bedtime',goal:'Sleep',why:'GABA enhancement',research:'Promotes relaxation without sedation. Improves sleep onset and quality.',link:'B0C9N1Q5QS'},
+            Apigenin:{name:'Apigenin',dose:'50mg',time:'bedtime',goal:'Sleep',why:'Calming',research:'Chamomile extract. Binds to benzodiazepine receptors. Reduces anxiety.',link:'B09WQWCP9K'},
+            Inositol:{name:'Myo-Inositol',dose:'2000mg',time:'bedtime',goal:'Sleep',why:'Sleep quality',research:'Improves sleep quality, reduces nighttime awakenings. Supports insulin.',link:'B00MRG3YP4'}
+        };
+        
         function gen(){
             supps=[];
             if(goals.indexOf('longevity')>-1){
-                supps.push(suppDB.NMNH);
-                supps.push(suppDB.Resveratrol);
-                supps.push(suppDB.Quercetin);
-                supps.push(suppDB['TMG (Betaine)']);
-                supps.push(suppDB.Spermidine);
+                supps.push(suppDB.NMNH,suppDB.Resveratrol,suppDB.Quercetin,suppDB.TMG,suppDB.Spermidine);
             }
             if(goals.indexOf('cognition')>-1){
-                supps.push(suppDB['L-Theanine']);
-                supps.push(suppDB.Phosphatidylserine);
-                supps.push(suppDB['Alpha-GPC']);
-                supps.push(suppDB['Lion\'s Mane']);
+                supps.push(suppDB.LTheanine,suppDB.Phosphatidylserine,suppDB.AlphaGPC,suppDB.LionsMane);
             }
             if(goals.indexOf('energy')>-1){
-                supps.push(suppDB.CoQ10);
-                supps.push(suppDB.Creatine);
-                supps.push(suppDB['PQQ (Pyrroloquinoline)']);
-                supps.push(suppDB['B-Complex']);
+                supps.push(suppDB.CoQ10,suppDB.Creatine,suppDB.PQQ,suppDB.BComplex);
             }
             if(goals.indexOf('body')>-1){
-                supps.push(suppDB['Vitamin D3 K2']);
-                supps.push(suppDB['L-Leucine']);
-                supps.push(suppDB['Omega-3 (EPA/DHA)']);
-                supps.push(suppDB.Boron);
+                supps.push(suppDB.D3K2,suppDB.Leucine,suppDB.Omega3,suppDB.Boron);
             }
             if(goals.indexOf('heart')>-1){
-                supps.push(suppDB['Magnesium Glycinate']);
-                supps.push(suppDB['Garlic Extract']);
-                supps.push(suppDB['Hawthorn Berry']);
-                supps.push(suppDB['Aged Black Garlic']);
+                supps.push(suppDB.Magnesium,suppDB.Garlic,suppDB.Hawthorn,suppDB.BlackGarlic);
             }
             if(goals.indexOf('sleep')>-1){
-                supps.push(suppDB.Glycine);
-                supps.push(suppDB['L-Theanine (PM)']);
-                supps.push(suppDB.Apigenin);
-                supps.push(suppDB['Myo-Inositol']);
+                supps.push(suppDB.Glycine,suppDB.LTheaninePM,suppDB.Apigenin,suppDB.Inositol);
             }
         }
-
-        // Render
+        
         function render(){
-            // Group by time
             var byTime={};
             supps.forEach(function(s){
                 if(!byTime[s.time])byTime[s.time]=[];
@@ -367,80 +165,34 @@
             });
             
             var html='';
-            var timeOrder=['morning','workout','evening','bedtime'];
+            var times=[['morning','Morning'],['workout','Workout'],['evening','Evening'],['bedtime','Bedtime']];
             
-            timeOrder.forEach(function(t){
-                if(byTime[t] && byTime[t].length>0){
-                    html+='<div style="margin-bottom:24px">';
-                    html+='<div style="background:linear-gradient(90deg,#10b981,#059669);color:white;padding:12px 16px;border-radius:8px;font-weight:bold;text-transform:uppercase;margin-bottom:12px">'+t+'</div>';
-                    byTime[t].forEach(function(s){
-                        // Find the name by looking up in suppDB
-                        var name=Object.keys(suppDB).find(function(k){return suppDB[k]===s;})||'Unknown';
-                        var link='https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
-                        html+='<div class="supp" style="border-left:4px solid ';
-                        if(s.goal==='Longevity')html+='#ec4899';
-                        else if(s.goal==='Cognition')html+='#8b5cf6';
-                        else if(s.goal==='Energy')html+='#f59e0b';
-                        else if(s.goal==='Body')html+='#10b981';
-                        else if(s.goal==='Heart')html+='#ef4444';
-                        else html+='#6366f1';
-                        html+='">';
+            times.forEach(function(t){
+                if(byTime[t[0]]&&byTime[t[0]].length){
+                    html+='<div class="time-header">'+t[1]+'</div>';
+                    byTime[t[0]].forEach(function(s){
+                        var colors={Longevity:'#ec4899',Cognition:'#8b5cf6',Energy:'#f59e0b',Body:'#10b981',Heart:'#ef4444',Sleep:'#6366f1'};
+                        html+='<div class="supp" style="border-left-color:'+colors[s.goal]+'">';
                         html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-                        html+='<span class="supp-name">'+name+'</span>';
-                        html+='<span style="background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;font-size:11px;text-transform:uppercase">'+s.goal+'</span>';
+                        html+='<span class="supp-name">'+s.name+'</span>';
+                        html+='<span class="supp-goal">'+s.goal+'</span>';
                         html+='</div>';
                         html+='<div class="supp-dose">'+s.dose+'</div>';
                         html+='<small style="color:#fbbf24">'+s.why+'</small>';
                         html+='<div class="supp-research">'+s.research+'</div>';
-                        html+='<a href="'+link+'" target="_blank" style="display:inline-block;margin-top:8px">Buy on Amazon</a>';
+                        html+='<a href="https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20" target="_blank">Buy on Amazon</a>';
                         html+='</div>';
                     });
-                    html+='</div>';
                 }
             });
             
-            if(html==='') html='<p style="color:#94a3b8">No supplements selected. Go back and choose goals.</p>';
-            
-            $('list').innerHTML=html;
+            $('list').innerHTML=html||'<p style="color:#94a3b8">No supplements selected.</p>';
         }
-
-        // PDF
-        function makePDF(){
-            if(!window.jspdf||!window.jspdf.jsPDF)return null;
-            var doc=new window.jspdf.jsPDF();
-            doc.setFillColor(99,102,241);doc.rect(0,0,210,30,'F');
-            doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('BioStack Pro',20,20);
-            doc.setTextColor(30,41,59);var y=40;
-            supps.forEach(function(s){
-                if(y>250){doc.addPage();y=20;}
-                doc.setFontSize(12);doc.text(s.name,20,y);y+=6;
-                doc.setFontSize(10);doc.text(s.dose+' - '+s.time,20,y);y+=5;
-                doc.setFontSize(9);doc.text(s.why,20,y);y+=5;
-                doc.setFontSize(8);doc.setTextColor(100,100,100);
-                var split=doc.splitTextToSize(s.research,170);
-                doc.text(split,20,y);y+=split.length*4+2;
-                doc.setTextColor(0,0,255);
-                doc.text('https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20',20,y);y+=5;
-                doc.setTextColor(30,41,59);y+=6;
-            });
-            return doc;
-        }
-
-        // Fill email form with stack data
-        function fillEmailForm(){
-            var stackText=supps.map(function(s){
-                return s.name+' - '+s.dose+' ('+s.time+')\nWhy: '+s.why+'\n\nResearch:\n'+s.research+'\n\nBuy: https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
-            }).join('\n\n==========\n\n');
-            
-            var fullMessage='YOUR BIOSTACK PROTOCOL\n\n'+stackText+'\n\nThanks for using BioStack Pro!';
-            $('formMessage').value=fullMessage;
-        }
-
-        // Events
+        
         $('cb').addEventListener('change',function(){$('b0').disabled=!this.checked;});
-
+        
         $('b0').addEventListener('click',function(){show(1);});
-
+        
         document.querySelectorAll('.goal').forEach(function(g){
             g.addEventListener('click',function(){
                 var goal=this.dataset.g;
@@ -454,9 +206,9 @@
                 $('b1').disabled=goals.length===0;
             });
         });
-
+        
         $('b1').addEventListener('click',function(){show(2);});
-
+        
         document.querySelectorAll('.exp-card').forEach(function(ex){
             ex.addEventListener('click',function(){
                 document.querySelectorAll('.exp-card').forEach(function(x){x.classList.remove('sel');});
@@ -465,37 +217,43 @@
                 $('b2').disabled=false;
             });
         });
-
+        
         $('b2').addEventListener('click',function(){gen();show(3);});
-
+        
         $('apply').addEventListener('click',function(){
-            var c=$('code').value.trim().toUpperCase();
-            if(codes[c]){discount=codes[c];$('price').textContent=discount===1?'FREE':'$'+(9.99*(1-discount)).toFixed(2);}
-            else{discount=0;$('price').textContent='$9.99';alert('Invalid code');}
+            var c=$('code').value.trim();
+            if(codes[c]){
+                discount=codes[c];
+                $('price').textContent=discount===1?'FREE':'$'+(9.99*(1-discount)).toFixed(2);
+            }else{
+                discount=0;
+                $('price').textContent='$9.99';
+                alert('Invalid code');
+            }
         });
-
+        
         $('pay').addEventListener('click',function(){
             userEmail=$('email').value.trim();
             if(!userEmail||userEmail.indexOf('@')===-1){alert('Enter valid email');return;}
             
             var finalPrice=9.99*(1-discount);
             
-            // If paid, proceed
             if(finalPrice>0){
-                // Store for Stripe return
                 localStorage.setItem('bs',JSON.stringify({g:goals,e:exp,d:discount,em:userEmail}));
                 var link='https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00';
                 if(discount===0.75)link='https://buy.stripe.com/00w14p4JucMX09f7Ly1wY04';
                 if(discount===0.5)link='https://buy.stripe.com/9B65kFfo800b8FL1na1wY03';
                 window.location.href=link+'?prefilled_email='+encodeURIComponent(userEmail);
             }else{
-                // Free - show immediately
                 render();
-                fillEmailForm();
+                var msg='YOUR BIOSTACK PROTOCOL\n\n'+supps.map(function(s){
+                    return s.name+' - '+s.dose+' ('+s.time+')\n'+s.why+'\n'+s.research+'\nhttps://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
+                }).join('\n\n==========\n\n');
+                $('formMessage').value=msg;
                 show(4);
             }
         });
-
+        
         $('again').addEventListener('click',function(){
             goals=[];exp='';supps=[];discount=0;userEmail='';
             $('cb').checked=false;$('b0').disabled=true;
@@ -503,11 +261,9 @@
             document.querySelectorAll('.exp-card').forEach(function(x){x.classList.remove('sel');});
             $('b1').disabled=true;$('b2').disabled=true;
             $('code').value='';$('email').value='';$('price').textContent='$9.99';
-            $('status').textContent='';
             show(0);
         });
-
-        // Check for Stripe return
+        
         var params=new URLSearchParams(window.location.search);
         if(params.get('paid')==='success'){
             var saved=localStorage.getItem('bs');
@@ -515,7 +271,11 @@
                 try{
                     var d=JSON.parse(saved);
                     goals=d.g;exp=d.e;discount=d.d;userEmail=d.em;
-                    gen();render();fillEmailForm();
+                    gen();render();
+                    var msg='YOUR BIOSTACK PROTOCOL\n\n'+supps.map(function(s){
+                        return s.name+' - '+s.dose+' ('+s.time+')\n'+s.why+'\n'+s.research+'\nhttps://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
+                    }).join('\n\n==========\n\n');
+                    $('formMessage').value=msg;
                     localStorage.removeItem('bs');
                     show(4);
                 }catch(e){}
