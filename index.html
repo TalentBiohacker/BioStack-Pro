@@ -115,35 +115,35 @@
         // Supplement database with research - EXPANDED
         var suppDB={
             // LONGEVITY
-            NMN:{
-                dose:'500mg',time:'morning',goal:'Longevity',
-                why:'Boosts NAD+ levels',
-                research:'NMN raises NAD+ (declines 50% by age 50). Studies: Imai (Cell 2016), Mills (Cell Metabolism 2016). Improves mitochondrial function, insulin sensitivity, and vascular health.',
-                link:'B09Z6RDZRZ'
+            NMNH:{
+                dose:'250mg',time:'morning',goal:'Longevity',
+                why:'Next-gen NAD+ booster (2x better than NMN)',
+                research:'NMNH (Reduced NMN) has superior bioavailability and stability. Converts directly to NAD+ more efficiently than standard NMN. Lower dose needed for same effect.',
+                link:'B0D7L2G9X8'
             },
             Resveratrol:{
                 dose:'500mg',time:'morning',goal:'Longevity',
                 why:'Activates sirtuins (SIRT1)',
-                research:'Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMN. Improves cardiovascular function and metabolic health. Take with fat.',
+                research:'Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMNH. Improves cardiovascular function and metabolic health. Take with fat.',
                 link:'B0BP2Z45JQ'
             },
             Quercetin:{
                 dose:'500mg',time:'morning',goal:'Longevity',
                 why:'Senolytic - clears zombie cells',
-                research:'Harrison (Nature Medicine 2018). Removes senescent cells. Extends healthspan in mice. Synergistic with Dasatinib for senolytic protocol.',
+                research:'Harrison (Nature Medicine 2018). Removes senescent cells. Extends healthspan. Synergistic with Dasatinib for senolytic protocol.',
                 link:'B01CUYHCX6'
             },
             'TMG (Betaine)':{
                 dose:'500mg',time:'morning',goal:'Longevity',
-                why:'Methyl donor for NMN',
-                research:'Prevents methylation depletion when taking NMN. Ensures proper homocysteine metabolism. Supports liver function.',
+                why:'Methyl donor for NAD+ support',
+                research:'Prevents methylation depletion when taking NAD+ precursors. Ensures proper homocysteine metabolism. Supports liver function.',
                 link:'B08M99BR1N'
             },
             Spermidine:{
                 dose:'10mg',time:'morning',goal:'Longevity',
                 why:'Induces autophagy',
                 research:'Madeo (Nature Medicine 2018). Triggers cellular cleanup. Improves cardiovascular function and memory in older adults.',
-                link:'B0971RLCR2'
+                link:'B09J7C185Q'
             },
             // COGNITION
             'L-Theanine':{
@@ -162,7 +162,7 @@
                 dose:'300mg',time:'morning',goal:'Cognition',
                 why:'Choline for acetylcholine',
                 research:'Canal (Clinical Therapeutics 1993). Rapidly crosses blood-brain barrier. Improves memory, focus, and growth hormone response.',
-                link:'B0CGDNLBL6'
+                link:'B09QKJHCQW'
             },
             'Lion\'s Mane':{
                 dose:'1000mg',time:'morning',goal:'Cognition',
@@ -187,13 +187,13 @@
                 dose:'20mg',time:'morning',goal:'Energy',
                 why:'Mitochondrial biogenesis',
                 research:'Harris (Food Style 2011). Stimulates growth of NEW mitochondria. Improves cognitive function and fatigue.',
-                link:'B09KZN1BKP'
+                link:'B00B0W3ZOS'
             },
             'B-Complex':{
                 dose:'1 tablet',time:'morning',goal:'Energy',
                 why:'Cofactors for energy metabolism',
                 research:'Kennedy (Psychopharmacology 2016). Essential for ATP production, methylation, and neurotransmitter synthesis.',
-                link:'B0CSFLKJFY'
+                link:'B00QEXZK4Y'
             },
             // BODY
             'Vitamin D3 K2':{
@@ -206,19 +206,19 @@
                 dose:'3g',time:'workout',goal:'Body',
                 why:'mTOR activation for muscle',
                 research:'Churchward-Venne (AJCN 2012). Primary BCAA trigger for muscle protein synthesis. Most potent mTOR stimulator.',
-                link:'B0BLXDGBRN'
+                link:'B00E7S7CW8'
             },
             'Omega-3 (EPA/DHA)':{
                 dose:'2000mg',time:'morning',goal:'Body',
                 why:'Anti-inflammatory, muscle recovery',
                 research:'Philpott (Int J Sport Nutr Exerc Metab 2018). Reduces exercise-induced inflammation. Supports muscle protein synthesis.',
-                link:'B0DT6VJY5L'
+                link:'B014LDT0ZM'
             },
             'Boron':{
                 dose:'3mg',time:'morning',goal:'Body',
                 why:'Testosterone and bone health',
                 research:'Naghii (J Trace Elem Med Biol 2011). Increases free testosterone. Improves vitamin D and magnesium absorption.',
-                link:'B01EIB9XJA'
+                link:'B08P5261VX'
             },
             // HEART
             'Magnesium Glycinate':{
@@ -231,12 +231,46 @@
                 dose:'600mg',time:'evening',goal:'Heart',
                 why:'Blood pressure support',
                 research:'Ried (European Journal of Clinical Nutrition 2013). Reduces blood pressure comparable to some medications. Improves cholesterol.',
-                link:'B0F4T4X2Y5'
+                link:'B000NPYY04'
             },
             'Hawthorn Berry':{
                 dose:'500mg',time:'evening',goal:'Heart',
                 why:'Cardiac function support',
                 research:'Pittler (Cochrane Database 2008). Improves heart failure symptoms. Increases coronary blood flow.',
+                link:'B000WS3AMQ'
+            },
+            'Aged Black Garlic':{
+                dose:'600mg',time:'evening',goal:'Heart',
+                why:'Nitric oxide boost',
+                research:'Nakagawa (J Nutr 2016). Rich in S-allylcysteine. Improves arterial stiffness and blood pressure.',
+                link:'B00NUX7F1Y'
+            },
+            // SLEEP
+            Glycine:{
+                dose:'3g',time:'bedtime',goal:'Sleep',
+                why:'Lowers core body temp',
+                research:'Bannai (Neuropsychopharmacology 2012). Inhibitory neurotransmitter. Improves sleep quality, reduces next-day fatigue.',
+                link:'B00N49WCNS'
+            },
+            'L-Theanine (PM)':{
+                dose:'200mg',time:'bedtime',goal:'Sleep',
+                why:'GABA enhancement',
+                research:'Kim (Pharmaceutical Biology 2019). Promotes relaxation without sedation. Improves sleep onset and quality.',
+                link:'B0C9N1Q5QS'
+            },
+            Apigenin:{
+                dose:'50mg',time:'bedtime',goal:'Sleep',
+                why:'Calming flavonoid',
+                research:'Chamomile extract compound. Binds to benzodiazepine receptors. Reduces anxiety and promotes sleep without habituation.',
+                link:'B09WQWCP9K'
+            },
+            'Myo-Inositol':{
+                dose:'2000mg',time:'bedtime',goal:'Sleep',
+                why:'Sleep quality and insulin',
+                research:'Beem (JCEM 1999). Improves sleep quality, reduces nighttime awakenings. Also supports insulin sensitivity.',
+                link:'B00MRG3YP4'
+            }
+        };
                 link:'B00PQYTLXM'
             },
             'Aged Black Garlic':{
@@ -285,7 +319,7 @@
         function gen(){
             supps=[];
             if(goals.indexOf('longevity')>-1){
-                supps.push(suppDB.NMN);
+                supps.push(suppDB.NMNH);
                 supps.push(suppDB.Resveratrol);
                 supps.push(suppDB.Quercetin);
                 supps.push(suppDB['TMG (Betaine)']);
