@@ -891,8 +891,12 @@
     </div>
 
     <script>
-        // Payment config
-        const STRIPE_LINK = 'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00';
+        // Payment config - Stripe links for each price point
+        const STRIPE_LINKS = {
+            full: 'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00',      // $9.99
+            half: 'https://buy.stripe.com/YOUR_5USD_LINK_HERE',         // $5.00 (HALF50)
+            discount: 'https://buy.stripe.com/YOUR_250_LINK_HERE'       // $2.50 (CLASSMATE75)
+        };
         const VENMO = '@talentbiohacker';
         const PAYPAL = 'talentbiohacker@gmail.com';
         const AMAZON_TAG = 'talentbiohack-20';
@@ -1097,6 +1101,7 @@
             
             const finalPrice = (BASE_PRICE * (1 - currentDisc)).toFixed(2);
             
+            // FREE download (FRIEND100)
             if (finalPrice === '0.00') {
                 closePaywall();
                 showPaidResults();
@@ -1104,17 +1109,18 @@
                 return;
             }
             
-            if (currentDisc > 0) {
-                const amount = currentDisc === 0.75 ? '$2.50' : '$5.00';
-                if (confirm(`Pay ${amount} via:\nVenmo: ${VENMO}\nPayPal: ${PAYPAL}\n\nInclude email: ${email}\n\nClick OK after paying.`)) {
-                    closePaywall();
-                    showPaidResults();
-                    setTimeout(downloadPDF, 500);
-                }
-                return;
+            // Select correct Stripe link based on discount
+            let stripeUrl;
+            if (currentDisc === 0.75) {
+                stripeUrl = STRIPE_LINKS.discount;  // $2.50
+            } else if (currentDisc === 0.50) {
+                stripeUrl = STRIPE_LINKS.half;      // $5.00
+            } else {
+                stripeUrl = STRIPE_LINKS.full;      // $9.99
             }
             
-            window.open(STRIPE_LINK + '?prefilled_email=' + encodeURIComponent(email), '_blank');
+            // Open Stripe with prefilled email
+            window.open(stripeUrl + '?prefilled_email=' + encodeURIComponent(email), '_blank');
         }
 
         function showPaidResults() {
