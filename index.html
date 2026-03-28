@@ -13,16 +13,8 @@
     <meta name="twitter:card" content="summary_large_image">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- EmailJS for sending PDFs via email (works on TikTok/Instagram in-app browsers) -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-        // Initialize EmailJS with your public key
-        // Get yours free at: https://dashboard.emailjs.com/admin/account
-        // Then replace 'YOUR_PUBLIC_KEY' below
-        (function() {
-            emailjs.init("YOUR_PUBLIC_KEY");
-        })();
-    </script>
+    <!-- Simple email delivery using Formspree (free, no template setup needed) -->
+    <!-- Just create account at formspree.io and replace the form ID below -->
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1318,15 +1310,27 @@
             URL.revokeObjectURL(url);
         }
 
-        // Email PDF to user (for TikTok/Instagram in-app browsers)
+        // Email PDF using Formspree (simple!)
+        // 1. Go to formspree.io, create account, copy your form ID
+        // 2. Replace "YOUR_FORM_ID" below with your actual ID (e.g., "xgvvenky")
         async function emailPDF(toEmail) {
+            const FORMSPREE_ID = 'YOUR_FORM_ID'; // <-- CHANGE THIS
+            
+            if (FORMSPREE_ID === 'YOUR_FORM_ID') {
+                alert('Email not set up yet. Downloading PDF instead...');
+                downloadPDF();
+                return;
+            }
+            
             const btn = document.querySelector('#step4 .btn-success') || document.querySelector('.btn-success');
-            if (btn) btn.textContent = '📧 Emailing PDF...';
+            if (btn) btn.textContent = '📧 Sending...';
             
             try {
+                // Generate PDF as blob
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
+                // Build PDF content
                 doc.setFillColor(99, 102, 241);
                 doc.rect(0, 0, 210, 50, 'F');
                 doc.setTextColor(255, 255, 255);
@@ -1335,115 +1339,81 @@
                 doc.text("BioStack Pro", 20, 30);
                 doc.setFontSize(12);
                 doc.text("Personalized Supplement Protocol", 20, 42);
-                doc.setFontSize(8);
-                doc.text("Contains Amazon affiliate links - talentbiohack-20", 20, 48);
                 
-                let y = 58;
+                let y = 55;
                 const goalNames = { longevity: 'Longevity', cognition: 'Cognition', energy: 'Energy', body: 'Body', heart: 'Heart', sleep: 'Sleep' };
                 
                 doc.setTextColor(99, 102, 241);
                 doc.setFontSize(14);
-                doc.setFont(undefined, 'bold');
                 doc.text("Goals:", 20, y);
                 y += 8;
                 doc.setTextColor(30, 41, 59);
                 doc.setFontSize(11);
-                doc.setFont(undefined, 'normal');
                 selectedGoals.forEach(g => { doc.text(`• ${goalNames[g]}`, 25, y); y += 6; });
                 y += 8;
                 
-                const timingNames = { morning: 'Morning', evening: 'Evening', bedtime: 'Bedtime', workout: 'Workout', any: 'Any Time' };
                 const byTiming = {};
                 currentStack.forEach(s => { if (!byTiming[s.timing]) byTiming[s.timing] = []; byTiming[s.timing].push(s); });
                 
                 Object.keys(byTiming).forEach(t => {
-                    if (y > 275) { doc.addPage(); y = 20; }
+                    if (y > 270) { doc.addPage(); y = 20; }
                     doc.setFillColor(239, 246, 255);
                     doc.rect(20, y - 5, 170, 9, 'F');
                     doc.setTextColor(99, 102, 241);
                     doc.setFontSize(11);
                     doc.setFont(undefined, 'bold');
-                    doc.text(timingNames[t] || t, 25, y);
+                    doc.text(t, 25, y);
                     y += 12;
                     
                     byTiming[t].forEach(s => {
-                        if (y > 275) { doc.addPage(); y = 20; }
+                        if (y > 270) { doc.addPage(); y = 20; }
                         doc.setTextColor(30, 41, 59);
                         doc.setFontSize(10);
                         doc.setFont(undefined, 'bold');
-                        doc.text(s.name.substring(0, 65), 25, y);
+                        doc.text(s.name.substring(0, 60), 25, y);
                         y += 5;
                         doc.setFont(undefined, 'normal');
                         doc.setTextColor(245, 158, 11);
                         doc.text(`Dose: ${s.dose}`, 25, y);
-                        y += 4;
-                        doc.setFontSize(8);
-                        doc.setTextColor(100, 116, 139);
-                        const why = doc.splitTextToSize(s.why, 160);
-                        doc.text(why, 25, y);
-                        y += why.length * 3.5 + 2;
-                        
+                        y += 6;
                         const link = amazonLinks[s.name];
                         if (link) {
                             doc.setTextColor(255, 153, 0);
-                            doc.setFont(undefined, 'bold');
                             doc.textWithLink('Buy on Amazon →', 25, y, { url: link });
                             y += 6;
                         }
                     });
-                    y += 3;
+                    y += 5;
                 });
                 
-                doc.addPage();
-                doc.setFillColor(239, 246, 255);
-                doc.rect(15, 15, 180, 50, 'F');
-                doc.setTextColor(99, 102, 241);
-                doc.setFontSize(14);
-                doc.setFont(undefined, 'bold');
-                doc.text("RETURNING CUSTOMER DISCOUNT", 20, 28);
-                doc.setTextColor(16, 185, 129);
-                doc.setFontSize(28);
-                doc.text("HALF50", 80, 45);
-                doc.setTextColor(30, 41, 59);
-                doc.setFontSize(10);
-                doc.text("Use code HALF50 for 50% off your next stack!", 20, 58);
+                // Convert to blob
+                const pdfBlob = doc.output('blob');
                 
-                doc.setFillColor(254, 242, 242);
-                doc.rect(15, 70, 180, 40, 'F');
-                doc.setTextColor(153, 27, 27);
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'bold');
-                doc.text("MEDICAL DISCLAIMER", 20, 80);
-                doc.setFontSize(8);
-                doc.text("This is for educational purposes only. Consult a healthcare provider before starting", 20, 87);
-                doc.text("any supplement regimen. Not evaluated by the FDA. Age 18+ only.", 20, 92);
+                // Send via Formspree
+                const formData = new FormData();
+                formData.append('email', toEmail);
+                formData.append('subject', 'Your BioStack Pro Protocol');
+                formData.append('message', `Your supplement protocol is attached! Use code HALF50 for 50% off next time.`);
+                formData.append('attachment', pdfBlob, 'BioStack-Pro-Protocol.pdf');
                 
-                const pdfBase64 = doc.output('datauristring').split(',')[1];
+                const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Accept': 'application/json' }
+                });
                 
-                if (typeof emailjs === 'undefined' || !emailjs.send) {
-                    alert('Email service not configured. PDF will download instead.');
-                    doc.save('BioStack-Pro-Protocol.pdf');
-                    if (btn) btn.textContent = '📄 PDF';
-                    return;
+                if (response.ok) {
+                    alert(`✅ PDF sent to ${toEmail}! Check your inbox.`);
+                } else {
+                    throw new Error('Formspree error');
                 }
                 
-                await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-                    to_email: toEmail,
-                    from_name: "BioStack Pro",
-                    subject: "Your BioStack Pro Supplement Protocol",
-                    message: `Hi!\n\nYour personalized supplement protocol is attached.\n\nGoals: ${selectedGoals.map(g => goalNames[g]).join(', ')}\n\nRETURNING CUSTOMER DISCOUNT: Use code HALF50 for 50% off!`,
-                    pdf_attachment: pdfBase64
-                });
-                
-                alert(`✅ PDF sent to ${toEmail}! Check your inbox.`);
-                if (btn) btn.textContent = '📄 PDF';
+                if (btn) btn.textContent = '📧 Email PDF';
                 
             } catch (err) {
                 console.error('Email error:', err);
-                if (btn) btn.textContent = '📄 PDF';
-                if (confirm('Could not email PDF. Download it now?')) {
-                    downloadPDF();
-                }
+                if (btn) btn.textContent = '📧 Email PDF';
+                downloadPDF(); // Fallback
             }
         }
 
