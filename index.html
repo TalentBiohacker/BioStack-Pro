@@ -54,12 +54,13 @@
         .em{width:100%;padding:14px;border:1px solid var(--d);background:var(--b);color:var(--t);border-radius:8px;margin:12px 0}
         .fl{text-align:left;margin:16px 0}
         .fl li{margin-bottom:8px;color:var(--l)}
+        .preview-note{color:var(--l);font-size:.9rem;margin:12px 0;padding:12px;background:rgba(255,255,255,.05);border-radius:8px}
     </style>
 </head>
 <body>
     <div class="wrap">
         <div class="head"><h1>BioStack Pro</h1><p>Personalized Supplement Protocol</p></div>
-        <div class="prog"><div id="pf" style="width:25%"></div></div>
+        <div class="prog"><div id="pf" style="width:33%"></div></div>
         <div id="pt" style="text-align:center;color:var(--l);margin-bottom:20px">Step 1 of 3: Accept terms</div>
 
         <!-- Step 0 -->
@@ -108,28 +109,38 @@
         <div class="mod hid" id="pw">
             <div class="mc">
                 <div class="mi">PDF</div>
-                <h3>Get Your Complete Stack Guide</h3>
-                <p style="color:var(--l)">PDF with full protocol & Amazon links</p>
+                <h3>Unlock Your Complete Stack Guide</h3>
+                <p style="color:var(--l)">Get the full PDF with dosages, timing & Amazon links</p>
                 <div class="pr" id="pd">$9.99</div>
                 <div class="di"><input type="text" id="dc" placeholder="Enter code"><button id="ba">Apply</button></div>
                 <div id="dm" style="margin:8px 0;font-size:.9rem"></div>
                 <ul class="fl"><li>Complete supplement schedule</li><li>Exact dosages & timing</li><li>Amazon purchase links</li><li>Print-friendly format</li></ul>
                 <input type="email" class="em" id="ei" placeholder="Enter your email">
                 <button class="btn btn-ok" id="bp">Pay & Get PDF</button>
-                <button class="btn btn-s" id="bc">Continue with preview</button>
+                <p class="preview-note">Or view a limited preview below (no PDF download)</p>
+                <button class="btn btn-s" id="bc">View Preview</button>
             </div>
         </div>
 
-        <!-- Step 3: Unlocked -->
+        <!-- Step 3: Preview (Limited) -->
         <div class="card hid" id="s3">
-            <h2>Your Complete Protocol</h2>
+            <h2>Your Stack Preview</h2>
+            <div class="preview-note"><strong>Limited Preview:</strong> Supplement names only. Unlock for full details, dosages & Amazon links.</div>
             <div id="fs"></div>
+            <button class="btn btn-ok" id="bunlock" style="margin-top:20px">Unlock Full PDF ($9.99)</button>
+            <button class="btn btn-s" id="br2" style="margin-top:12px">New Stack</button>
+        </div>
+
+        <!-- Step 4: Unlocked Full Stack -->
+        <div class="card hid" id="s4">
+            <h2>Your Complete Protocol</h2>
+            <div id="fsfull"></div>
             <div style="margin-top:20px;padding:20px;background:var(--b);border-radius:12px;border:2px dashed var(--d)">
                 <h3 style="text-align:center;margin-bottom:15px">Save Your Stack</h3>
                 <div class="sw">
                     <button class="btn btn-s" id="bx">Share</button>
                     <button class="btn btn-s" id="bcy">Copy</button>
-                    <button class="btn btn-ok" id="bd">Download</button>
+                    <button class="btn btn-ok" id="bd">Download PDF</button>
                     <button class="btn" id="be" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">Email PDF</button>
                 </div>
             </div>
@@ -139,65 +150,89 @@
 
     <script>
     (function(){
+        // Config
         var SL={full:'https://buy.stripe.com/28E14p5Ny6ozg8de9W1wY00',half:'https://buy.stripe.com/9B65kFfo800b8FL1na1wY03',disc:'https://buy.stripe.com/00w14p4JucMX09f7Ly1wY04'};
         var DC={'CLASSMATE75':{d:0.75,msg:'75% off! Pay $2.50'},'FRIEND100':{d:1,msg:'FREE!'},'HALF50':{d:0.5,msg:'50% off! Pay $5.00'}};
         var BP=9.99,AT='talentbiohack-20';
         
-        var acc=false,sg=[],ex='',cd=0,cs=[],em='';
+        // State
+        var acc=false,sg=[],ex='',cd=0,cs=[],em='',isPaid=false;
         
-        var al={'NMN':'https://www.amazon.com/dp/B09Z6RDZRZ?tag='+AT,'Resveratrol':'https://www.amazon.com/dp/B0BP2Z45JQ?tag='+AT,'L-Theanine':'https://www.amazon.com/dp/B0C9N1Q5QS?tag='+AT,'Phosphatidylserine':'https://www.amazon.com/dp/B079YF1K1B?tag='+AT,'CoQ10':'https://www.amazon.com/dp/B0019GW3G8?tag='+AT,'Creatine':'https://www.amazon.com/dp/B00IUHNCH0?tag='+AT,'Vitamin D3 K2':'https://www.amazon.com/dp/B07K3VFVJC?tag='+AT,'L-Leucine':'https://www.amazon.com/dp/B0BLXDGBRN?tag='+AT,'Magnesium':'https://www.amazon.com/dp/B00151G8L8?tag='+AT,'Glycine':'https://www.amazon.com/dp/B00N49WCNS?tag='+AT};
+        // Amazon links
+        var al={'NMN':'https://www.amazon.com/dp/B09Z6RDZRZ?tag='+AT,'Resveratrol':'https://www.amazon.com/dp/B0BP2Z45JQ?tag='+AT,'L-Theanine':'https://www.amazon.com/dp/B0C9N1Q5QS?tag='+AT,'Phosphatidylserine':'https://www.amazon.com/dp/B079YF1K1B?tag='+AT,'CoQ10':'https://www.amazon.com/dp/B0019GW3G8?tag='+AT,'Creatine':'https://www.amazon.com/dp/B00IUHNCH0?tag='+AT,'Vitamin D3 K2':'https://www.amazon.com/dp/B07K3VFVJC?tag='+AT,'L-Leucine':'https://www.amazon.com/dp/B0BLXDGBRN?tag='+AT,'Magnesium Glycinate':'https://www.amazon.com/dp/B00151G8L8?tag='+AT,'Glycine':'https://www.amazon.com/dp/B00N49WCNS?tag='+AT};
         
+        // Elements
         var e={
-            s0:document.getElementById('s0'),s1:document.getElementById('s1'),s2:document.getElementById('s2'),s3:document.getElementById('s3'),
-            pw:document.getElementById('pw'),fs:document.getElementById('fs'),pf:document.getElementById('pf'),pt:document.getElementById('pt'),
-            ac:document.getElementById('ac'),b0:document.getElementById('b0'),b1:document.getElementById('b1'),b2:document.getElementById('b2'),
+            s0:document.getElementById('s0'),s1:document.getElementById('s1'),s2:document.getElementById('s2'),s3:document.getElementById('s3'),s4:document.getElementById('s4'),
+            pw:document.getElementById('pw'),fs:document.getElementById('fs'),fsfull:document.getElementById('fsfull'),pf:document.getElementById('pf'),pt:document.getElementById('pt'),
+            ac:document.getElementById('ac'),b0:document.getElementById('b0'),b1:document.getElementById('b1'),b2:document.getElementById('b2'),bunlock:document.getElementById('bunlock'),
             gl:document.getElementById('gl'),el:document.getElementById('el'),pd:document.getElementById('pd'),dc:document.getElementById('dc'),
             ba:document.getElementById('ba'),dm:document.getElementById('dm'),ei:document.getElementById('ei'),bp:document.getElementById('bp'),
             bc:document.getElementById('bc'),bx:document.getElementById('bx'),bcy:document.getElementById('bcy'),bd:document.getElementById('bd'),
-            be:document.getElementById('be'),br:document.getElementById('br'),bk1:document.getElementById('bk1')
+            be:document.getElementById('be'),br:document.getElementById('br'),br2:document.getElementById('br2'),bk1:document.getElementById('bk1')
         };
         
+        // Show step
         function show(n){
-            e.s0.classList.add('hid');e.s1.classList.add('hid');e.s2.classList.add('hid');e.s3.classList.add('hid');
-            var p=[25,50,75,100],t=['Step 1 of 3: Accept terms','Step 2 of 3: Select goals','Step 3 of 3: Choose experience','Your complete protocol'];
+            e.s0.classList.add('hid');e.s1.classList.add('hid');e.s2.classList.add('hid');e.s3.classList.add('hid');e.s4.classList.add('hid');
+            var p=[33,66,100,100,100],t=['Step 1 of 3: Accept terms','Step 2 of 3: Select goals','Step 3 of 3: Choose experience','Stack Preview (Limited)','Your Complete Protocol'];
             e.pf.style.width=p[n]+'%';e.pt.textContent=t[n];
             if(n===0)e.s0.classList.remove('hid');
             if(n===1)e.s1.classList.remove('hid');
             if(n===2)e.s2.classList.remove('hid');
-            if(n===3){e.s3.classList.remove('hid');rf();}
+            if(n===3){e.s3.classList.remove('hid');renderPreview();}
+            if(n===4){e.s4.classList.remove('hid');renderFull();}
         }
         
+        // Generate stack (deduplicated)
         function gen(){
             cs=[];
-            if(sg.indexOf('longevity')>-1){cs.push({n:'NMN',d:'500mg',t:'morning',w:'Boosts NAD+'});cs.push({n:'Resveratrol',d:'500mg',t:'morning',w:'Activates sirtuins'});}
-            if(sg.indexOf('cognition')>-1){cs.push({n:'L-Theanine',d:'200mg',t:'morning',w:'Calm focus'});cs.push({n:'Phosphatidylserine',d:'300mg',t:'morning',w:'Brain membranes'});}
-            if(sg.indexOf('energy')>-1){cs.push({n:'CoQ10',d:'200mg',t:'morning',w:'Mitochondrial ATP'});cs.push({n:'Creatine',d:'5g',t:'morning',w:'ATP-PCr system'});}
-            if(sg.indexOf('body')>-1){cs.push({n:'Vitamin D3 K2',d:'5000 IU',t:'morning',w:'Testosterone & calcium'});cs.push({n:'L-Leucine',d:'3g',t:'workout',w:'mTOR activation'});}
-            if(sg.indexOf('heart')>-1){cs.push({n:'Magnesium',d:'400mg',t:'evening',w:'Heart rhythm & BP'});cs.push({n:'CoQ10',d:'100mg',t:'morning',w:'Heart energy'});}
-            if(sg.indexOf('sleep')>-1){cs.push({n:'Magnesium',d:'400mg',t:'bedtime',w:'GABA activation'});cs.push({n:'Glycine',d:'3g',t:'bedtime',w:'Lowers core temp'});}
+            var has={};
+            function add(s){if(!has[s.n]){has[s.n]=true;cs.push(s);}}
+            
+            if(sg.indexOf('longevity')>-1){add({n:'NMN',d:'500mg',t:'morning',w:'Boosts NAD+'});add({n:'Resveratrol',d:'500mg',t:'morning',w:'Activates sirtuins'});}
+            if(sg.indexOf('cognition')>-1){add({n:'L-Theanine',d:'200mg',t:'morning',w:'Calm focus'});add({n:'Phosphatidylserine',d:'300mg',t:'morning',w:'Brain membranes'});}
+            if(sg.indexOf('energy')>-1){add({n:'CoQ10',d:'200mg',t:'morning',w:'Mitochondrial ATP'});add({n:'Creatine',d:'5g',t:'morning',w:'ATP-PCr system'});}
+            if(sg.indexOf('body')>-1){add({n:'Vitamin D3 K2',d:'5000 IU',t:'morning',w:'Testosterone & calcium'});add({n:'L-Leucine',d:'3g',t:'workout',w:'mTOR activation'});}
+            if(sg.indexOf('heart')>-1){add({n:'Magnesium Glycinate',d:'400mg',t:'evening',w:'Heart rhythm & BP'});}
+            if(sg.indexOf('sleep')>-1){add({n:'Magnesium Glycinate',d:'400mg',t:'bedtime',w:'GABA activation'});add({n:'Glycine',d:'3g',t:'bedtime',w:'Lowers core temp'});}
         }
         
-        function rf(){
+        // Render limited preview (names only)
+        function renderPreview(){
+            var bt={},h='',t,s;
+            for(var i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
+            var keys=Object.keys(bt);
+            for(var k=0;k<keys.length;k++){t=keys[k];h+='<div class="tm"><div class="th">'+t.toUpperCase()+'</div>';for(var j=0;j<bt[t].length;j++){s=bt[t][j];h+='<div class="si"><div><h4>'+s.n+'</h4></div></div>';}h+='</div>';}
+            e.fs.innerHTML=h;
+        }
+        
+        // Render full stack (with links)
+        function renderFull(){
             var bt={},h='',t,s,lk;
             for(var i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
             var keys=Object.keys(bt);
             for(var k=0;k<keys.length;k++){t=keys[k];h+='<div class="tm"><div class="th">'+t.toUpperCase()+'</div>';for(var j=0;j<bt[t].length;j++){s=bt[t][j];lk=al[s.n];h+='<div class="si"><div><h4>'+s.n+'</h4><div class="sd">'+s.d+'</div><div style="color:var(--l);font-size:.85rem;margin-top:4px">'+s.w+'</div>'+(lk?'<a href="'+lk+'" target="_blank" style="color:#ff9900;font-size:.85rem">Amazon</a>':'')+'</div></div>';}h+='</div>';}
-            e.fs.innerHTML=h;
+            e.fsfull.innerHTML=h;
         }
         
         function up(){var pr=(BP*(1-cd)).toFixed(2);e.pd.textContent=pr==='0.00'?'FREE':'$'+pr;}
         
+        // PDF generation (FIXED - no textWithLink)
         function pdf(){
-            if(!window.jspdf){alert('PDF loading...');return;}
-            var jsPDF=window.jspdf.jsPDF,doc=new jsPDF();
-            doc.setFillColor(99,102,241);doc.rect(0,0,210,40,'F');
-            doc.setTextColor(255,255,255);doc.setFontSize(24);doc.text('BioStack Pro',20,25);
-            doc.setTextColor(30,41,59);var y=50;
-            var bt={},t,s,lk,i,j,keys,k;
-            for(i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
-            keys=Object.keys(bt);
-            for(k=0;k<keys.length;k++){t=keys[k];doc.setFontSize(14);doc.text(t.toUpperCase(),20,y);y+=8;for(j=0;j<bt[t].length;j++){s=bt[t][j];doc.setFontSize(11);doc.text(s.n,25,y);y+=5;doc.setFontSize(9);doc.text(s.d+' - '+s.w,25,y);y+=5;lk=al[s.n];if(lk){doc.setTextColor(255,153,0);doc.textWithLink('Buy on Amazon',25,y,{url:lk});doc.setTextColor(30,41,59);y+=5;}y+=3;if(y>270){doc.addPage();y=20;}}y+=5;}
-            doc.save('BioStack-Pro.pdf');
+            if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF library not loaded. Please refresh.');return false;}
+            try{
+                var jsPDF=window.jspdf.jsPDF,doc=new jsPDF();
+                doc.setFillColor(99,102,241);doc.rect(0,0,210,40,'F');
+                doc.setTextColor(255,255,255);doc.setFontSize(24);doc.text('BioStack Pro',20,25);
+                doc.setTextColor(30,41,59);var y=50;
+                var bt={},t,s,lk,i,j,keys,k;
+                for(i=0;i<cs.length;i++){s=cs[i];if(!bt[s.t])bt[s.t]=[];bt[s.t].push(s);}
+                keys=Object.keys(bt);
+                for(k=0;k<keys.length;k++){t=keys[k];doc.setFontSize(14);doc.text(t.toUpperCase(),20,y);y+=8;for(j=0;j<bt[t].length;j++){s=bt[t][j];doc.setFontSize(11);doc.text(s.n,25,y);y+=5;doc.setFontSize(9);doc.text(s.d+' - '+s.w,25,y);y+=5;lk=al[s.n];if(lk){doc.setTextColor(0,0,255);doc.text('Buy on Amazon: '+lk,25,y);doc.setTextColor(30,41,59);y+=5;}y+=3;if(y>270){doc.addPage();y=20;}}y+=5;}
+                doc.save('BioStack-Pro.pdf');
+                return true;
+            }catch(err){alert('PDF error: '+err.message);return false;}
         }
         
         // Event listeners
@@ -229,7 +264,14 @@
         e.b2.addEventListener('click',function(){if(!ex)return;gen();e.pw.classList.remove('hid');up();});
         
         e.bk1.addEventListener('click',function(){show(1);});
-        e.bc.addEventListener('click',function(){e.pw.classList.add('hid');});
+        
+        // View Preview button - shows limited preview
+        e.bc.addEventListener('click',function(){e.pw.classList.add('hid');show(3);});
+        
+        // Unlock from preview
+        e.bunlock.addEventListener('click',function(){e.pw.classList.remove('hid');up();});
+        
+        e.br2.addEventListener('click',function(){reset();show(0);});
         
         e.ba.addEventListener('click',function(){
             var c=e.dc.value.trim().toUpperCase();
@@ -241,39 +283,61 @@
         e.bp.addEventListener('click',function(){
             em=e.ei.value;if(!em||em.indexOf('@')===-1){alert('Please enter a valid email');return;}
             var pr=(BP*(1-cd)).toFixed(2);
-            if(pr==='0.00'){e.pw.classList.add('hid');show(3);return;}
-            localStorage.setItem('bs',JSON.stringify({g:sg,x:ex,s:cs,d:cd,e:em}));
+            if(pr==='0.00'){isPaid=true;e.pw.classList.add('hid');show(4);return;}
+            localStorage.setItem('bs',JSON.stringify({g:sg,x:ex,s:cs,d:cd,e:em,paid:false}));
             var u=SL.full;if(cd===0.75)u=SL.disc;if(cd===0.5)u=SL.half;
             window.open(u+'?prefilled_email='+encodeURIComponent(em),'_blank');
             e.bp.textContent="I've Completed Payment";
-            e.bp.onclick=function(){e.pw.classList.add('hid');show(3);};
+            e.bp.onclick=function(){isPaid=true;e.pw.classList.add('hid');show(4);};
         });
         
-        e.bx.addEventListener('click',function(){var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');if(navigator.share){navigator.share({title:'My BioStack',text:t});}else{alert('Share: '+t);}});
+        // Share
+        e.bx.addEventListener('click',function(){
+            var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');
+            if(navigator.share){navigator.share({title:'My BioStack',text:t});}
+            else{alert('Share:\n'+t);}
+        });
         
-        e.bcy.addEventListener('click',function(){var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');navigator.clipboard.writeText(t).then(function(){alert('Copied!');});});
+        // Copy
+        e.bcy.addEventListener('click',function(){
+            var t=cs.map(function(s){return s.n+': '+s.d;}).join('\n');
+            if(navigator.clipboard){
+                navigator.clipboard.writeText(t).then(function(){alert('Copied!');},function(){alert('Copy:\n'+t);});
+            }else{alert('Copy:\n'+t);}
+        });
         
+        // Download PDF
         e.bd.addEventListener('click',pdf);
         
-        e.be.addEventListener('click',function(){var to=prompt('Enter your email:');if(to&&to.indexOf('@')>-1){alert('PDF emailed to '+to+'! (Simulated)');pdf();}});
+        // Email PDF
+        e.be.addEventListener('click',function(){
+            var to=prompt('Enter your email:');
+            if(to&&to.indexOf('@')>-1){
+                if(pdf()){alert('PDF saved! Email it to: '+to);}
+            }
+        });
         
-        e.br.addEventListener('click',function(){
-            acc=false;sg=[];ex='';cd=0;cs=[];em='';
+        // Reset
+        function reset(){
+            acc=false;sg=[];ex='';cd=0;cs=[];em='';isPaid=false;
             e.ac.checked=false;e.b0.disabled=true;
             var allG=e.gl.querySelectorAll('.gc');for(var m=0;m<allG.length;m++)allG[m].classList.remove('sel');
             var allE=e.el.querySelectorAll('.ec');for(var n=0;n<allE.length;n++)allE[n].classList.remove('sel');
             e.b1.disabled=true;e.b2.disabled=true;
             e.dc.value='';e.dm.textContent='';e.ei.value='';
             e.bp.textContent='Pay & Get PDF';
-            show(0);
-        });
+            e.bp.onclick=null;
+        }
         
+        e.br.addEventListener('click',function(){reset();show(0);});
+        
+        // Check for Stripe return
         var upm=new URLSearchParams(window.location.search);
         if(upm.get('paid')==='success'){
             var sv=localStorage.getItem('bs');
             if(sv){
-                var d=JSON.parse(sv);sg=d.g;ex=d.x;cs=d.s;cd=d.d;em=d.e;
-                localStorage.removeItem('bs');show(3);
+                var d=JSON.parse(sv);sg=d.g;ex=d.x;cs=d.s;cd=d.d;em=d.e;isPaid=true;
+                localStorage.removeItem('bs');show(4);
             }
         }
     })();
