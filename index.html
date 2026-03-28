@@ -112,67 +112,163 @@
         var goals=[],exp='',supps=[],discount=0,price=9.99,userEmail='';
         var codes={CLASSMATE75:0.75,FRIEND100:1,HALF50:0.5};
         
-        // Supplement database with research
+        // Supplement database with research - EXPANDED
         var suppDB={
+            // LONGEVITY
             NMN:{
-                dose:'500mg',time:'morning',
+                dose:'500mg',time:'morning',goal:'Longevity',
                 why:'Boosts NAD+ levels',
-                research:'NMN raises NAD+ (declines 50% by age 50). Studies: Imai (Cell 2016), Mills (Cell Metabolism 2016). Improves mitochondrial function, insulin sensitivity, and vascular health in humans.',
+                research:'NMN raises NAD+ (declines 50% by age 50). Studies: Imai (Cell 2016), Mills (Cell Metabolism 2016). Improves mitochondrial function, insulin sensitivity, and vascular health.',
                 link:'B09Z6RDZRZ'
             },
             Resveratrol:{
-                dose:'500mg',time:'morning',
-                why:'Activates sirtuins',
-                research:'Activates SIRT1 (longevity gene). Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMN. Improves cardiovascular function and metabolic health. Take with fat for absorption.',
+                dose:'500mg',time:'morning',goal:'Longevity',
+                why:'Activates sirtuins (SIRT1)',
+                research:'Sinclair (Nature 2003), Baur (Nature 2006). Synergistic with NMN. Improves cardiovascular function and metabolic health. Take with fat.',
                 link:'B0BP2Z45JQ'
             },
+            Quercetin:{
+                dose:'500mg',time:'morning',goal:'Longevity',
+                why:'Senolytic - clears zombie cells',
+                research:'Harrison (Nature Medicine 2018). Removes senescent cells. Extends healthspan in mice. Synergistic with Dasatinib for senolytic protocol.',
+                link:'B01CUYHCX6'
+            },
+            'TMG (Betaine)':{
+                dose:'500mg',time:'morning',goal:'Longevity',
+                why:'Methyl donor for NMN',
+                research:'Prevents methylation depletion when taking NMN. Ensures proper homocysteine metabolism. Supports liver function.',
+                link:'B08M99BR1N'
+            },
+            Spermidine:{
+                dose:'10mg',time:'morning',goal:'Longevity',
+                why:'Induces autophagy',
+                research:'Madeo (Nature Medicine 2018). Triggers cellular cleanup. Improves cardiovascular function and memory in older adults.',
+                link:'B0971RLCR2'
+            },
+            // COGNITION
             'L-Theanine':{
-                dose:'200mg',time:'morning',
+                dose:'200mg',time:'morning',goal:'Cognition',
                 why:'Calm focus without jitters',
-                research:'Increases alpha brain waves (relaxed alertness). Giesbrecht (Nutritional Neuroscience 2010). Synergistic with caffeine. Reduces stress and improves attention in clinical trials.',
+                research:'Giesbrecht (Nutritional Neuroscience 2010). Increases alpha brain waves. Synergistic with caffeine. Reduces stress, improves attention.',
                 link:'B0C9N1Q5QS'
             },
             Phosphatidylserine:{
-                dose:'300mg',time:'morning',
-                why:'Supports brain membranes',
-                research:'Key component of neuronal membranes. Kato-Kataoka (Journal of Clinical Biochemistry 2010). Improves memory in aging adults and reduces cortisol response to stress.',
+                dose:'300mg',time:'morning',goal:'Cognition',
+                why:'Brain membrane support',
+                research:'Kato-Kataoka (J Clinical Biochemistry 2010). Key neuronal membrane component. Improves memory and reduces cortisol response.',
                 link:'B079YF1K1B'
             },
+            'Alpha-GPC':{
+                dose:'300mg',time:'morning',goal:'Cognition',
+                why:'Choline for acetylcholine',
+                research:'Canal (Clinical Therapeutics 1993). Rapidly crosses blood-brain barrier. Improves memory, focus, and growth hormone response.',
+                link:'B0CGDNLBL6'
+            },
+            'Lion\'s Mane':{
+                dose:'1000mg',time:'morning',goal:'Cognition',
+                why:'Nerve Growth Factor stimulation',
+                research:'Mori (Biological & Pharmaceutical Bulletin 2009). Promotes NGF synthesis. Improves mild cognitive impairment and mood.',
+                link:'B01JZN35MM'
+            },
+            // ENERGY
             CoQ10:{
-                dose:'200mg',time:'morning',
+                dose:'200mg',time:'morning',goal:'Energy',
                 why:'Mitochondrial ATP production',
-                research:'Essential for electron transport chain. Declines after age 30. Rosenfeldt (Journal of Cardiac Failure 2007). Improves heart function, reduces statin side effects, boosts energy.',
+                research:'Rosenfeldt (J Cardiac Failure 2007). Essential for electron transport. Declines after age 30. Improves heart function and energy.',
                 link:'B0019GW3G8'
             },
             Creatine:{
-                dose:'5g',time:'morning',
+                dose:'5g',time:'morning',goal:'Energy',
                 why:'ATP-PCr energy system',
-                research:'Most researched sports supplement. Kreider (Journal of the International Society of Sports Nutrition 2017). Also improves cognitive performance, especially in sleep-deprived individuals.',
+                research:'Kreider (JISSN 2017). Most researched sports supplement. Improves cognitive performance, especially when sleep-deprived.',
                 link:'B00IUHNCH0'
             },
+            'PQQ (Pyrroloquinoline)':{
+                dose:'20mg',time:'morning',goal:'Energy',
+                why:'Mitochondrial biogenesis',
+                research:'Harris (Food Style 2011). Stimulates growth of NEW mitochondria. Improves cognitive function and fatigue.',
+                link:'B09KZN1BKP'
+            },
+            'B-Complex':{
+                dose:'1 tablet',time:'morning',goal:'Energy',
+                why:'Cofactors for energy metabolism',
+                research:'Kennedy (Psychopharmacology 2016). Essential for ATP production, methylation, and neurotransmitter synthesis.',
+                link:'B0CSFLKJFY'
+            },
+            // BODY
             'Vitamin D3 K2':{
-                dose:'5000 IU',time:'morning',
-                why:'Directs calcium to bones, not arteries',
-                research:'K2 activates osteocalcin (bone) and matrix Gla protein (arteries). Knapen (Osteoporosis International 2013). D3+K2 together prevents arterial calcification better than D3 alone.',
+                dose:'5000 IU',time:'morning',goal:'Body',
+                why:'Directs calcium to bones',
+                research:'Knapen (Osteoporosis International 2013). K2 activates osteocalcin and matrix Gla protein. Prevents arterial calcification.',
                 link:'B07K3VFVJC'
             },
             'L-Leucine':{
-                dose:'3g',time:'workout',
+                dose:'3g',time:'workout',goal:'Body',
                 why:'mTOR activation for muscle',
-                research:'Primary BCAA trigger for muscle protein synthesis. Churchward-Venne (American Journal of Clinical Nutrition 2012). Most potent amino acid for stimulating mTOR pathway.',
+                research:'Churchward-Venne (AJCN 2012). Primary BCAA trigger for muscle protein synthesis. Most potent mTOR stimulator.',
                 link:'B0BLXDGBRN'
             },
-            Magnesium:{
-                dose:'400mg',time:'evening',
-                why:'Heart rhythm and relaxation',
-                research:'Glycinate form has highest bioavailability. Cazzola (Minerva Cardioangiologica 2003). Regulates 300+ enzymes, critical for ATP production, muscle relaxation, and sleep quality.',
+            'Omega-3 (EPA/DHA)':{
+                dose:'2000mg',time:'morning',goal:'Body',
+                why:'Anti-inflammatory, muscle recovery',
+                research:'Philpott (Int J Sport Nutr Exerc Metab 2018). Reduces exercise-induced inflammation. Supports muscle protein synthesis.',
+                link:'B0DT6VJY5L'
+            },
+            'Boron':{
+                dose:'3mg',time:'morning',goal:'Body',
+                why:'Testosterone and bone health',
+                research:'Naghii (J Trace Elem Med Biol 2011). Increases free testosterone. Improves vitamin D and magnesium absorption.',
+                link:'B01EIB9XJA'
+            },
+            // HEART
+            'Magnesium Glycinate':{
+                dose:'400mg',time:'evening',goal:'Heart',
+                why:'Heart rhythm and BP',
+                research:'Cazzola (Minerva Cardioangiologica 2003). Regulates 300+ enzymes. Critical for ATP, muscle relaxation, blood pressure.',
                 link:'B00151G8L8'
             },
+            'Garlic Extract':{
+                dose:'600mg',time:'evening',goal:'Heart',
+                why:'Blood pressure support',
+                research:'Ried (European Journal of Clinical Nutrition 2013). Reduces blood pressure comparable to some medications. Improves cholesterol.',
+                link:'B0F4T4X2Y5'
+            },
+            'Hawthorn Berry':{
+                dose:'500mg',time:'evening',goal:'Heart',
+                why:'Cardiac function support',
+                research:'Pittler (Cochrane Database 2008). Improves heart failure symptoms. Increases coronary blood flow.',
+                link:'B00PQYTLXM'
+            },
+            'Aged Black Garlic':{
+                dose:'600mg',time:'evening',goal:'Heart',
+                why:'Nitric oxide boost',
+                research:'Nakagawa (J Nutr 2016). Rich in S-allylcysteine. Improves arterial stiffness and blood pressure.',
+                link:'B0BLXDGBRN'
+            },
+            // SLEEP
             Glycine:{
-                dose:'3g',time:'bedtime',
-                why:'Lowers core body temp for sleep',
-                research:'Inhibitory neurotransmitter. Bannai (Neuropsychopharmacology 2012). Improves sleep quality, reduces next-day fatigue. Also supports collagen synthesis and gut health.',
+                dose:'3g',time:'bedtime',goal:'Sleep',
+                why:'Lowers core body temp',
+                research:'Bannai (Neuropsychopharmacology 2012). Inhibitory neurotransmitter. Improves sleep quality, reduces next-day fatigue.',
                 link:'B00N49WCNS'
+            },
+            'L-Theanine (PM)':{
+                dose:'200mg',time:'bedtime',goal:'Sleep',
+                why:'GABA enhancement',
+                research:'Kim (Pharmaceutical Biology 2019). Promotes relaxation without sedation. Improves sleep onset and quality.',
+                link:'B0C9N1Q5QS'
+            },
+            'Apigenin':{
+                dose:'50mg',time:'bedtime',goal:'Sleep',
+                why:'Calming flavonoid',
+                research:'Chamomile extract compound. Binds to benzodiazepine receptors. Reduces anxiety and promotes sleep without habituation.',
+                link:'B09Z6RDZRZ'
+            },
+            'Myo-Inositol':{
+                dose:'2000mg',time:'bedtime',goal:'Sleep',
+                why:'Sleep quality and insulin',
+                research:'Beem (JCEM 1999). Improves sleep quality, reduces nighttime awakenings. Also supports insulin sensitivity.',
+                link:'B0019GW3G8'
             }
         };
 
@@ -185,32 +281,94 @@
             $('s'+step).classList.add('active');
         }
 
-        // Generate supplements
+        // Generate supplements - 4 per goal
         function gen(){
-            supps=[];var has={};
-            function add(key){if(!has[key]&&suppDB[key]){has[key]=1;supps.push(Object.assign({name:key},suppDB[key]));}}
-            if(goals.indexOf('longevity')>-1){add('NMN');add('Resveratrol');}
-            if(goals.indexOf('cognition')>-1){add('L-Theanine');add('Phosphatidylserine');}
-            if(goals.indexOf('energy')>-1){add('CoQ10');add('Creatine');}
-            if(goals.indexOf('body')>-1){add('Vitamin D3 K2');add('L-Leucine');}
-            if(goals.indexOf('heart')>-1){add('Magnesium');if(!has['CoQ10'])add('CoQ10');}
-            if(goals.indexOf('sleep')>-1){add('Magnesium');add('Glycine');}
+            supps=[];
+            if(goals.indexOf('longevity')>-1){
+                supps.push(suppDB.NMN);
+                supps.push(suppDB.Resveratrol);
+                supps.push(suppDB.Quercetin);
+                supps.push(suppDB['TMG (Betaine)']);
+                supps.push(suppDB.Spermidine);
+            }
+            if(goals.indexOf('cognition')>-1){
+                supps.push(suppDB['L-Theanine']);
+                supps.push(suppDB.Phosphatidylserine);
+                supps.push(suppDB['Alpha-GPC']);
+                supps.push(suppDB['Lion\'s Mane']);
+            }
+            if(goals.indexOf('energy')>-1){
+                supps.push(suppDB.CoQ10);
+                supps.push(suppDB.Creatine);
+                supps.push(suppDB['PQQ (Pyrroloquinoline)']);
+                supps.push(suppDB['B-Complex']);
+            }
+            if(goals.indexOf('body')>-1){
+                supps.push(suppDB['Vitamin D3 K2']);
+                supps.push(suppDB['L-Leucine']);
+                supps.push(suppDB['Omega-3 (EPA/DHA)']);
+                supps.push(suppDB.Boron);
+            }
+            if(goals.indexOf('heart')>-1){
+                supps.push(suppDB['Magnesium Glycinate']);
+                supps.push(suppDB['Garlic Extract']);
+                supps.push(suppDB['Hawthorn Berry']);
+                supps.push(suppDB['Aged Black Garlic']);
+            }
+            if(goals.indexOf('sleep')>-1){
+                supps.push(suppDB.Glycine);
+                supps.push(suppDB['L-Theanine (PM)']);
+                supps.push(suppDB.Apigenin);
+                supps.push(suppDB['Myo-Inositol']);
+            }
         }
 
         // Render
         function render(){
-            var html='';
+            // Group by time
+            var byTime={};
             supps.forEach(function(s){
-                var link='https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
-                html+='<div class="supp">';
-                html+='<div class="supp-name">'+s.name+'</div>';
-                html+='<div class="supp-dose">'+s.dose+' ('+s.time+')</div>';
-                html+='<small>'+s.why+'</small><br>';
-                html+='<div class="supp-research">'+s.research+'</div>';
-                html+='<a href="'+link+'" target="_blank">Buy on Amazon</a>';
-                html+='</div>';
+                if(!byTime[s.time])byTime[s.time]=[];
+                byTime[s.time].push(s);
             });
+            
+            var html='';
+            var timeOrder=['morning','workout','evening','bedtime'];
+            
+            timeOrder.forEach(function(t){
+                if(byTime[t] && byTime[t].length>0){
+                    html+='<div style="margin-bottom:24px">';
+                    html+='<div style="background:linear-gradient(90deg,#10b981,#059669);color:white;padding:12px 16px;border-radius:8px;font-weight:bold;text-transform:uppercase;margin-bottom:12px">'+t+'</div>';
+                    byTime[t].forEach(function(s){
+                        // Find the name by looking up in suppDB
+                        var name=Object.keys(suppDB).find(function(k){return suppDB[k]===s;})||'Unknown';
+                        var link='https://www.amazon.com/dp/'+s.link+'?tag=talentbiohack-20';
+                        html+='<div class="supp" style="border-left:4px solid ';
+                        if(s.goal==='Longevity')html+='#ec4899';
+                        else if(s.goal==='Cognition')html+='#8b5cf6';
+                        else if(s.goal==='Energy')html+='#f59e0b';
+                        else if(s.goal==='Body')html+='#10b981';
+                        else if(s.goal==='Heart')html+='#ef4444';
+                        else html+='#6366f1';
+                        html+='">';
+                        html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+                        html+='<span class="supp-name">'+name+'</span>';
+                        html+='<span style="background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:12px;font-size:11px;text-transform:uppercase">'+s.goal+'</span>';
+                        html+='</div>';
+                        html+='<div class="supp-dose">'+s.dose+'</div>';
+                        html+='<small style="color:#fbbf24">'+s.why+'</small>';
+                        html+='<div class="supp-research">'+s.research+'</div>';
+                        html+='<a href="'+link+'" target="_blank" style="display:inline-block;margin-top:8px">Buy on Amazon</a>';
+                        html+='</div>';
+                    });
+                    html+='</div>';
+                }
+            });
+            
+            if(html==='') html='<p style="color:#94a3b8">No supplements selected. Go back and choose goals.</p>';
+            
             $('list').innerHTML=html;
+        }
         }
 
         // PDF
